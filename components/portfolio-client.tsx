@@ -3,8 +3,8 @@
 import Image from 'next/image';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ArrowDown, ArrowUpRight, AtSign, Camera, Check, CirclePlay, Copy, ExternalLink, Mail,
-  MessageCircle, Music2, Play, ShoppingBag, Sparkles, Tv,
+  ArrowDown, AtSign, Camera, CirclePlay, Copy, ExternalLink, Flame, Link2, Mail,
+  MessageCircle, Music2, Phone, Play, ShoppingBag, Tv,
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -15,28 +15,51 @@ const categories: Category[] = ['MOTION', 'MV EDIT', 'AI VIDEO'];
 
 const ui = {
   en: {
-    work: 'Work', about: 'About', contact: 'Contact', available: 'Available for freelance', explore: 'Explore selected work',
-    portfolio: 'Portfolio', selected: 'Selected works', choose: 'Choose a discipline to explore the reel.',
-    empty: 'New work is being prepared.', emptyNote: 'Yuuta is adding projects to this category. Check back soon.', showMore: 'Show more',
-    aboutLabel: 'About Yuuta', aboutTitle: 'Motion with intent. Edits with energy.',
-    services: 'Creative disciplines', motionDesc: 'SaaS Motion · Kinetic Typography · SaaS Explainer',
-    mvDesc: 'Anime MV · Manga Animation · Lyric Video', aiDesc: 'AI Commercial · Generative Video · Full AI Production',
-    contactLabel: 'Start a project', contactTitle: 'Have an idea? Let’s move it.',
-    contactNote: 'Available for freelance motion design, video editing and AI video production.',
-    copy: 'Copy', copied: 'Copied', watchOn: 'Watch on', close: 'Close video',
+    work: 'Works', about: 'About', contact: 'Contact', share: 'Share', shared: 'Website link copied!',
+    hello: 'Hi! I’m Yuuta', showMore: 'Show more', showLess: 'Show less', play: 'Play video',
+    worksSub: 'Choose a category above and click a thumbnail to watch it here.',
+    empty: 'New work is being prepared!', emptyNote: 'Yuuta is adding projects to this category. Please come back soon ✦',
+    aboutSub: 'A little introduction from Yuuta.',
+    contactSub: 'For commissions and collaboration, tap a card to copy the contact.',
+    copied: 'Copied to clipboard!', watchOn: 'Watch on', unavailable: 'This video cannot be embedded.',
+    motionDesc: 'SaaS Motion · Kinetic Typography · SaaS Explainer',
+    mvDesc: 'Anime MV · Manga Animation · Lyric Video',
+    aiDesc: 'AI Commercial · Generative Video · Full AI Production',
+    botName: 'YUUTA BOT', online: 'Online', botHello: 'Hi! I’m Yuuta Bot ✦ What would you like to know?',
+    faq: [
+      { q: 'What does Yuuta create?', a: 'Yuuta creates motion graphics, anime and manga MV edits, lyric videos, and AI-powered commercial videos.' },
+      { q: 'How can I commission Yuuta?', a: 'Send the brief, references, expected deadline and budget through Gmail, Discord, Zalo or WhatsApp. Yuuta will reply to discuss the direction.' },
+      { q: 'Which video links work here?', a: 'The portfolio can play public YouTube, Vimeo, TikTok and Instagram video links directly on the website.' },
+    ],
   },
   vi: {
-    work: 'Dự án', about: 'Giới thiệu', contact: 'Liên hệ', available: 'Nhận dự án freelance', explore: 'Xem dự án nổi bật',
-    portfolio: 'Portfolio', selected: 'Dự án nổi bật', choose: 'Chọn một lĩnh vực để xem tác phẩm.',
-    empty: 'Dự án mới đang được chuẩn bị.', emptyNote: 'Yuuta đang cập nhật tác phẩm cho danh mục này. Hãy quay lại sớm nhé.', showMore: 'Xem thêm',
-    aboutLabel: 'Về Yuuta', aboutTitle: 'Chuyển động có mục đích. Nhịp dựng đầy năng lượng.',
-    services: 'Lĩnh vực sáng tạo', motionDesc: 'SaaS Motion · Kinetic Typography · SaaS Explainer',
-    mvDesc: 'Anime MV · Manga Animation · Lyric Video', aiDesc: 'Quảng cáo AI · Video tạo sinh · Sản xuất hoàn toàn bằng AI',
-    contactLabel: 'Bắt đầu dự án', contactTitle: 'Có ý tưởng? Hãy cùng chuyển động.',
-    contactNote: 'Nhận dự án motion design, video editing và sản xuất video bằng AI.',
-    copy: 'Sao chép', copied: 'Đã chép', watchOn: 'Xem trên', close: 'Đóng video',
+    work: 'Tác phẩm', about: 'Giới thiệu', contact: 'Liên hệ', share: 'Chia sẻ', shared: 'Đã sao chép liên kết website!',
+    hello: 'Xin chào! Mình là Yuuta', showMore: 'Xem thêm', showLess: 'Thu gọn', play: 'Phát video',
+    worksSub: 'Chọn danh mục phía trên và bấm vào ảnh để xem video ngay tại đây.',
+    empty: 'Dự án mới đang được chuẩn bị!', emptyNote: 'Yuuta đang cập nhật tác phẩm cho danh mục này. Hãy quay lại sớm nhé ✦',
+    aboutSub: 'Một chút giới thiệu về Yuuta.',
+    contactSub: 'Để đặt dự án hoặc hợp tác, hãy bấm vào thẻ để sao chép liên hệ.',
+    copied: 'Đã sao chép!', watchOn: 'Xem trên', unavailable: 'Video này không thể nhúng trực tiếp.',
+    motionDesc: 'SaaS Motion · Kinetic Typography · SaaS Explainer',
+    mvDesc: 'Anime MV · Manga Animation · Lyric Video',
+    aiDesc: 'Quảng cáo AI · Video tạo sinh · Sản xuất hoàn toàn bằng AI',
+    botName: 'YUUTA BOT', online: 'Trực tuyến', botHello: 'Xin chào! Mình là Yuuta Bot ✦ Bạn muốn biết điều gì?',
+    faq: [
+      { q: 'Yuuta làm những thể loại nào?', a: 'Yuuta thực hiện motion graphics, MV anime và manga, lyric video, cùng video quảng cáo được sản xuất bằng AI.' },
+      { q: 'Làm sao để đặt dự án?', a: 'Bạn gửi brief, hình ảnh tham khảo, thời hạn và ngân sách qua Gmail, Discord, Zalo hoặc WhatsApp. Yuuta sẽ phản hồi để trao đổi hướng thực hiện.' },
+      { q: 'Website hỗ trợ link video nào?', a: 'Portfolio có thể phát trực tiếp các link công khai từ YouTube, Vimeo, TikTok và Instagram.' },
+    ],
   },
 };
+
+const backgroundDecorations = [
+  ['✦', '7%', '15%', '16px', '0s', '6s'], ['✧', '20%', '42%', '22px', '1.2s', '8s'],
+  ['◆', '34%', '12%', '13px', '2.8s', '7s'], ['✦', '47%', '68%', '18px', '.6s', '9s'],
+  ['✧', '61%', '27%', '25px', '3.5s', '8s'], ['✦', '74%', '54%', '15px', '2s', '6s'],
+  ['◆', '88%', '18%', '12px', '4s', '9s'], ['✧', '94%', '73%', '21px', '1.8s', '7s'],
+  ['✦', '12%', '82%', '18px', '3s', '8s'], ['◆', '28%', '91%', '11px', '.3s', '6s'],
+  ['✧', '55%', '88%', '17px', '4.6s', '9s'], ['✦', '82%', '92%', '24px', '2.4s', '7s'],
+] as const;
 
 function SocialGlyph({ platform }: { platform: string }) {
   if (platform === 'youtube') return <CirclePlay />;
@@ -48,7 +71,7 @@ function SocialGlyph({ platform }: { platform: string }) {
   if (platform === 'bilibili') return <Tv />;
   if (platform === 'threads') return <AtSign />;
   if (platform === 'x') return <span className="brand-letter">X</span>;
-  return <ArrowUpRight />;
+  return <ExternalLink />;
 }
 
 function SocialDock({ socials }: { socials: SocialLink[] }) {
@@ -72,23 +95,26 @@ function SocialDock({ socials }: { socials: SocialLink[] }) {
   );
 }
 
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return <div className="cute-section-title"><span>✦</span><h2>{children}</h2><span>✦</span></div>;
+}
+
 function ProjectCard({ project, language, index, onOpen }: { project: Project; language: Language; index: number; onOpen: () => void }) {
   const title = language === 'en' ? project.titleEn : project.titleVi;
-  const tags = (language === 'en' ? project.tagsEn : project.tagsVi).split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 3);
   return (
-    <article className="project-card-wrap">
-      <button className={`project-card project-card-${(index % 3) + 1}`} onClick={onOpen} aria-label={`Play ${title}`}>
-        <span className={`project-visual platform-${project.platform}`} style={project.thumbnailUrl ? { backgroundImage: `url(${project.thumbnailUrl})` } : undefined}>
-          <span className="project-number">{String(index + 1).padStart(2, '0')}</span>
-          <span className="platform-badge">{platformName(project.platform)}</span>
-          <span className="play-button"><Play fill="currentColor" /></span>
-        </span>
-        <span className="project-meta">
-          <span><small>{project.category}</small><strong>{title}</strong></span>
-          <ArrowUpRight />
-        </span>
-        {tags.length > 0 && <span className="project-tags">{tags.map((tag) => <i key={tag}>{tag}</i>)}</span>}
+    <article className="portfolio-card reveal-item" style={{ transitionDelay: `${Math.min(index, 5) * 55}ms` }}>
+      <button className={`project-thumb platform-${project.platform}`} onClick={onOpen} aria-label={`${ui[language].play}: ${title}`} style={project.thumbnailUrl ? { backgroundImage: `url(${project.thumbnailUrl})` } : undefined}>
+        {!project.thumbnailUrl && <Image src="/yuuta-logo-final.png" alt="" width={1400} height={1120} />}
+        <span className="platform-corner">{platformName(project.platform)}</span>
+        <span className="play-bubble"><i><Play fill="currentColor" /></i></span>
       </button>
+      <div className="portfolio-card-body">
+        <p>{title}</p>
+        <div className="portfolio-card-actions">
+          <button onClick={onOpen}>{ui[language].play}</button>
+          <a href={project.videoUrl} target="_blank" rel="noreferrer">{platformName(project.platform)} ↗</a>
+        </div>
+      </div>
     </article>
   );
 }
@@ -101,27 +127,64 @@ function VideoDialog({ project, open, onOpenChange, language }: { project: Proje
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="video-dialog" aria-label={title}>
         <DialogHeader className="video-dialog-header">
+          <span className="window-dot dark" /><span className="window-dot cyan" />
           <div><DialogTitle>{title}</DialogTitle>{project && <DialogDescription>{project.category} · {platformName(project.platform)}</DialogDescription>}</div>
         </DialogHeader>
         {project && parsed ? (
           <div className={`player-shell ${parsed.vertical ? 'vertical' : ''}`}>
             <iframe key={parsed.embedUrl} src={parsed.embedUrl} title={title} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen />
           </div>
-        ) : project ? <div className="player-fallback"><p>This video cannot be embedded.</p></div> : null}
-        {description && <p className="video-description">{description}</p>}
-        {project && <a className="watch-external" href={project.videoUrl} target="_blank" rel="noreferrer">{ui[language].watchOn} {platformName(project.platform)} <ExternalLink /></a>}
+        ) : project ? <div className="player-fallback"><p>{ui[language].unavailable}</p></div> : null}
+        {(description || project) && <div className="video-dialog-footer">{description && <p>{description}</p>}{project && <a href={project.videoUrl} target="_blank" rel="noreferrer">{ui[language].watchOn} {platformName(project.platform)} <ExternalLink /></a>}</div>}
       </DialogContent>
     </Dialog>
   );
 }
 
-function CopyContact({ label, value, href, copyLabel, copiedLabel }: { label: string; value: string; href: string; copyLabel: string; copiedLabel: string }) {
-  const [copied, setCopied] = useState(false);
-  const copyValue = async () => {
-    try { await navigator.clipboard.writeText(value); setCopied(true); window.setTimeout(() => setCopied(false), 1600); } catch { window.location.href = href; }
-  };
+function ContactCard({ icon, label, value, onCopy }: { icon: React.ReactNode; label: string; value: string; onCopy: () => void }) {
   return (
-    <div className="contact-row"><a href={href}><small>{label}</small><strong>{value}</strong></a><button onClick={() => void copyValue()}>{copied ? <Check /> : <Copy />}{copied ? copiedLabel : copyLabel}</button></div>
+    <button className="cute-contact-card reveal-item" onClick={onCopy}>
+      <span className="cute-contact-icon">{icon}</span>
+      <span className="cute-contact-info"><b>{label}</b><strong>{value}</strong></span>
+      <Copy className="contact-copy-icon" />
+    </button>
+  );
+}
+
+function YuutaBot({ language }: { language: Language }) {
+  const t = ui[language];
+  const [open, setOpen] = useState(false);
+  const [question, setQuestion] = useState('');
+  const [answer, setAnswer] = useState('');
+  const [typing, setTyping] = useState(false);
+  const answerTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    setQuestion(''); setAnswer(''); setTyping(false);
+    if (answerTimer.current) clearTimeout(answerTimer.current);
+    return () => { if (answerTimer.current) clearTimeout(answerTimer.current); };
+  }, [language]);
+
+  const ask = (nextQuestion: string, nextAnswer: string) => {
+    if (answerTimer.current) clearTimeout(answerTimer.current);
+    setQuestion(nextQuestion); setAnswer(''); setTyping(true);
+    answerTimer.current = setTimeout(() => { setTyping(false); setAnswer(nextAnswer); }, 520);
+  };
+
+  return (
+    <>
+      <aside className={`chat-panel ${open ? 'open' : ''}`} aria-hidden={!open} inert={!open}>
+        <div className="chat-head"><Flame /><b>{t.botName}</b><span>{t.online}</span><button onClick={() => setOpen(false)} aria-label="Close chat">×</button></div>
+        <div className="chat-body">
+          <p className="chat-message bot">{t.botHello}</p>
+          {question && <p className="chat-message user">{question}</p>}
+          {typing && <p className="chat-message bot typing"><i /><i /><i /></p>}
+          {answer && <p className="chat-message bot">{answer}</p>}
+          <div className="chat-chips">{t.faq.map((item) => <button key={item.q} onClick={() => ask(item.q, item.a)}>{item.q}</button>)}</div>
+        </div>
+      </aside>
+      <button className="chat-fab" onClick={() => setOpen((value) => !value)} aria-label="FAQ chat" aria-expanded={open}><Flame /><span /></button>
+    </>
   );
 }
 
@@ -131,7 +194,9 @@ export function PortfolioClient({ initialContent }: { initialContent: PortfolioC
   const [visible, setVisible] = useState(6);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [videoOpen, setVideoOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const t = ui[language];
   const { settings, projects, socials } = initialContent;
 
@@ -140,17 +205,72 @@ export function PortfolioClient({ initialContent }: { initialContent: PortfolioC
   const role = language === 'en' ? settings.roleEn : settings.roleVi;
   const headline = language === 'en' ? settings.headlineEn : settings.headlineVi;
   const bio = language === 'en' ? settings.bioEn : settings.bioVi;
+  const categoryDescription = category === 'MOTION' ? t.motionDesc : category === 'MV EDIT' ? t.mvDesc : t.aiDesc;
+
+  useEffect(() => { document.documentElement.lang = language; }, [language]);
 
   useEffect(() => {
-    document.documentElement.lang = language;
-  }, [language]);
+    const sparkle = (event: PointerEvent) => {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const symbols = ['✦', '✧', '◆', '✦', '◇'];
+      for (let index = 0; index < symbols.length; index += 1) {
+        const particle = document.createElement('span');
+        const angle = (Math.PI * 2 * index) / symbols.length + Math.random() * .7;
+        particle.className = 'click-spark'; particle.textContent = symbols[index];
+        particle.style.left = `${event.clientX - 7}px`; particle.style.top = `${event.clientY - 7}px`;
+        particle.style.setProperty('--spark-x', `${Math.cos(angle) * (30 + Math.random() * 26)}px`);
+        particle.style.setProperty('--spark-y', `${Math.sin(angle) * (30 + Math.random() * 26)}px`);
+        document.body.appendChild(particle);
+        window.setTimeout(() => particle.remove(), 750);
+      }
+    };
+    document.addEventListener('pointerdown', sparkle);
+    return () => document.removeEventListener('pointerdown', sparkle);
+  }, []);
 
-  const changeCategory = (next: Category) => { setCategory(next); setVisible(6); };
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('shown'); observer.unobserve(entry.target); } });
+    }, { threshold: .12 });
+    document.querySelectorAll('.reveal-item').forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, [category, shown.length]);
+
+  useEffect(() => () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+  }, []);
+
+  const showToast = (message: string) => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToastMessage(message);
+    toastTimer.current = setTimeout(() => setToastMessage(''), 2800);
+  };
+
+  const copyText = async (value: string) => {
+    try { await navigator.clipboard.writeText(value); }
+    catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = value; document.body.appendChild(textarea); textarea.select(); document.execCommand('copy'); textarea.remove();
+    }
+    showToast(t.copied);
+  };
+
+  const shareWebsite = async () => {
+    await copyText(window.location.origin);
+    showToast(t.shared);
+  };
+
+  const changeCategory = (next: Category, scroll = false) => {
+    setCategory(next); setVisible(6);
+    if (scroll) window.setTimeout(() => document.getElementById('work')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30);
+  };
+
   const openProject = (project: Project) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
-    setSelectedProject(project);
-    setVideoOpen(true);
+    setSelectedProject(project); setVideoOpen(true);
   };
+
   const handleVideoOpen = (open: boolean) => {
     setVideoOpen(open);
     if (open) return;
@@ -159,62 +279,78 @@ export function PortfolioClient({ initialContent }: { initialContent: PortfolioC
   };
 
   return (
-    <main>
+    <main className="yuuta-site">
+      <div className="background-decorations" aria-hidden="true">
+        {backgroundDecorations.map(([symbol, left, top, size, delay, duration], index) => (
+          <span key={`${symbol}-${index}`} style={{ left, top, fontSize: size, animationDelay: delay, animationDuration: duration }}>{symbol}</span>
+        ))}
+      </div>
+
       <header className="site-header">
-        <a className="mini-brand" href="#top" aria-label="Yuuta home">YUUTA<span>®</span></a>
-        <nav aria-label="Main navigation"><a href="#work">{t.work}</a><a href="#about">{t.about}</a><a href="#contact">{t.contact}</a></nav>
-        <div className="language-switch" aria-label="Language">
-          <button className={language === 'en' ? 'active' : ''} onClick={() => setLanguage('en')} aria-pressed={language === 'en'}>EN</button><span>/</span>
-          <button className={language === 'vi' ? 'active' : ''} onClick={() => setLanguage('vi')} aria-pressed={language === 'vi'}>VI</button>
+        <div className="header-inner">
+          <a className="header-brand" href="#top" aria-label="Yuuta home"><Image src="/yuuta-logo-final.png" alt="Yuuta" width={1400} height={1120} priority /></a>
+          <nav aria-label="Main navigation">
+            <a href="#work">{t.work}</a><a href="#contact">{t.contact}</a>
+            <button className="share-button" onClick={() => void shareWebsite()} aria-label={t.share}><Link2 /></button>
+            <div className="language-switch" data-language={language} aria-label="Language">
+              <span className="language-pill" />
+              <button className={language === 'en' ? 'active' : ''} onClick={() => setLanguage('en')} aria-pressed={language === 'en'}>EN</button>
+              <button className={language === 'vi' ? 'active' : ''} onClick={() => setLanguage('vi')} aria-pressed={language === 'vi'}>VI</button>
+            </div>
+          </nav>
         </div>
       </header>
 
       <section className="hero" id="top">
-        <div className="hero-glow hero-glow-one" /><div className="hero-glow hero-glow-two" />
-        <div className="hero-copy">
-          <p className="eyebrow"><Sparkles size={15} /> {role}</p>
-          <h1>{headline}</h1><p className="hero-intro">{bio}</p>
-          <div className="hero-actions"><a className="primary-action" href="#work">{t.explore} <ArrowDown /></a><span className="availability"><i /> {t.available}</span></div>
-          <SocialDock socials={socials} />
+        <Image className="hero-logo" src="/yuuta-logo-final.png" alt="Yuuta logo" width={1400} height={1120} priority />
+        <p className="hero-hello">{t.hello} — {role} ✦</p>
+        <p className="hero-tagline">{headline} ✦</p>
+        <div className="hero-badges" role="tablist" aria-label="Project categories">
+          {categories.map((item) => <button key={item} role="tab" aria-selected={category === item} className={`hero-badge ${category === item ? 'active' : ''}`} onClick={() => changeCategory(item, true)}>{item}</button>)}
         </div>
-        <div className="logo-stage" aria-label="Yuuta logo">
-          <div className="orbit orbit-one" /><div className="orbit orbit-two" />
-          <Image src="/yuuta-logo-final.png" alt="Yuuta logo" width={1400} height={1120} priority />
-          <span className="stage-tag stage-tag-top">{settings.name}</span><span className="stage-tag stage-tag-bottom">Saigon · VN</span>
-        </div>
+        <SocialDock socials={socials} />
       </section>
 
-      <section className="work-section" id="work">
-        <div className="section-heading"><div><p className="eyebrow">01 · {t.portfolio}</p><h2>{t.selected}</h2></div><p>{t.choose}</p></div>
-        <div className="category-tabs" role="tablist" aria-label="Project categories">
-          {categories.map((item) => <button key={item} role="tab" aria-selected={category === item} className={category === item ? 'active' : ''} onClick={() => changeCategory(item)}>{item}</button>)}
-        </div>
+      <section className="cute-section works-section" id="work">
+        <SectionTitle>WORKS</SectionTitle>
+        <p className="cute-section-sub">{category} · {categoryDescription}<br />{t.worksSub}</p>
         {shown.length ? (
-          <><div className="project-grid">{shown.map((project, index) => <ProjectCard key={project.id} project={project} language={language} index={index} onOpen={() => openProject(project)} />)}</div>
-          {visible < filtered.length && <button className="show-more" onClick={() => setVisible((count) => count + 6)}>{t.showMore} <ArrowDown /></button>}</>
-        ) : <div className="work-empty"><span><Play /></span><h3>{t.empty}</h3><p>{t.emptyNote}</p></div>}
+          <>
+            <div className="portfolio-grid">{shown.map((project, index) => <ProjectCard key={project.id} project={project} language={language} index={index} onOpen={() => openProject(project)} />)}</div>
+            {filtered.length > 6 && <div className="more-row"><button className={`more-button ${visible >= filtered.length ? 'less' : ''}`} onClick={() => setVisible((count) => count >= filtered.length ? 6 : filtered.length)}>{visible >= filtered.length ? t.showLess : `${t.showMore} (+${filtered.length - visible})`} <ArrowDown /></button></div>}
+          </>
+        ) : (
+          <div className="cute-empty reveal-item"><Image src="/yuuta-logo-final.png" alt="" width={1400} height={1120} /><h3>{t.empty}</h3><p>{t.emptyNote}</p></div>
+        )}
       </section>
 
-      <section className="about-section" id="about">
-        <div className="about-intro"><p className="eyebrow">02 · {t.aboutLabel}</p><h2>{t.aboutTitle}</h2><p>{bio}</p></div>
-        <div className="service-stack" aria-label={t.services}>
-          <article><span>01</span><div><h3>MOTION</h3><p>{t.motionDesc}</p></div></article>
-          <article><span>02</span><div><h3>MV EDIT</h3><p>{t.mvDesc}</p></div></article>
-          <article><span>03</span><div><h3>AI VIDEO</h3><p>{t.aiDesc}</p></div></article>
+      <section className="cute-section about-cute-section" id="about">
+        <SectionTitle>ABOUT</SectionTitle>
+        <p className="cute-section-sub">{t.aboutSub}</p>
+        <div className="about-card reveal-item">
+          <Image src="/yuuta-logo-final.png" alt="Yuuta" width={1400} height={1120} />
+          <div><p className="about-kicker">VÕ GIA HUY · YUUTA</p><h3>{headline}</h3><p>{bio}</p><div className="about-tags"><span>MOTION</span><span>MV EDIT</span><span>AI VIDEO</span></div></div>
         </div>
       </section>
 
-      <section className="contact-section" id="contact">
-        <div className="contact-heading"><p className="eyebrow">03 · {t.contactLabel}</p><h2>{t.contactTitle}</h2><p>{t.contactNote}</p></div>
-        <div className="contact-list">
-          <CopyContact label="Email" value={settings.email} href={`mailto:${settings.email}`} copyLabel={t.copy} copiedLabel={t.copied} />
-          <CopyContact label="Discord" value={settings.discord} href="https://discord.com/app" copyLabel={t.copy} copiedLabel={t.copied} />
-          <CopyContact label="Zalo / WhatsApp" value={settings.phone} href={`https://zalo.me/${settings.phone}`} copyLabel={t.copy} copiedLabel={t.copied} />
+      <section className="cute-section contact-cute-section" id="contact">
+        <SectionTitle>CONTACT</SectionTitle>
+        <p className="cute-section-sub">{t.contactSub}</p>
+        <div className="cute-contact-cards">
+          <ContactCard icon={<Mail />} label="E-MAIL" value={settings.email} onCopy={() => void copyText(settings.email)} />
+          <ContactCard icon={<MessageCircle />} label="DISCORD" value={`@${settings.discord}`} onCopy={() => void copyText(settings.discord)} />
+          <ContactCard icon={<Phone />} label="ZALO · WHATSAPP" value={settings.phone} onCopy={() => void copyText(settings.phone)} />
         </div>
       </section>
 
-      <footer><a className="mini-brand" href="#top">YUUTA<span>®</span></a><p>© {new Date().getFullYear()} {settings.name}. All motion, all heart.</p><a href="/admin">Settings</a></footer>
+      <footer className="cute-footer">
+        <a href="#top" aria-label="Back to top"><Image src="/yuuta-logo-final.png" alt="Yuuta" width={1400} height={1120} /></a>
+        <p>© {new Date().getFullYear()} {settings.stageName}</p><a href="/admin">Settings</a>
+      </footer>
+
       <VideoDialog project={selectedProject} open={videoOpen} onOpenChange={handleVideoOpen} language={language} />
+      <YuutaBot language={language} />
+      {toastMessage && <div className="site-toast" role="status">✦ {toastMessage}</div>}
     </main>
   );
 }

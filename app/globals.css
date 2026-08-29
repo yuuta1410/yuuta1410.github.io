@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
@@ -163,6 +164,57 @@ footer > a:last-child:hover { color: #55d8ff; }
 .watch-external svg { width: 14px; }
 .player-fallback { display: grid; min-height: 280px; place-items: center; border-radius: 16px; background: #0b1f3a; color: #9db2c9; }
 .brand-letter { font: 900 1rem var(--font-geist-sans); }
+
+/* Yuuta public direction — Mero-inspired structure with Yuuta's blue palette */
+body { background-color: #f9fcff; background-image: radial-gradient(rgba(36,119,255,.13) 2.5px,transparent 2.5px); background-size: 34px 34px; color: #102033; }
+.yuuta-site { position: relative; min-height: 100vh; overflow-x: hidden; font-family: 'Baloo 2',var(--font-geist-sans),sans-serif; font-weight: 600; }
+.background-decorations { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.background-decorations span { position: absolute; color: #86ddff; opacity: .55; animation: yuuta-float 7s ease-in-out infinite; user-select: none; }
+@keyframes yuuta-float { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-22px) rotate(12deg); } }
+.yuuta-site .site-header { position: sticky; top: 0; z-index: 50; display: block; min-height: 0; padding: 0; border-bottom: 3px solid #eaf5ff; background: rgba(249,252,255,.85); backdrop-filter: blur(10px); }
+.header-inner { display: flex; align-items: center; justify-content: space-between; gap: 14px; max-width: 1080px; margin: 0 auto; padding: 12px 22px; }
+.header-brand { display: flex; align-items: center; height: 46px; cursor: pointer; }
+.header-brand img { width: auto; height: 46px; mix-blend-mode: multiply; object-fit: contain; transition: transform .3s cubic-bezier(.34,1.56,.64,1); }
+.header-brand:hover img { transform: scale(1.08) rotate(-2deg); }
+.yuuta-site .site-header nav { display: flex; align-items: center; gap: 8px; font: inherit; letter-spacing: normal; text-transform: none; }
+.yuuta-site .site-header nav > a { padding: 8px 16px; border: 2.5px solid transparent; border-radius: 999px; color: #2477ff; font-size: 1.02rem; font-weight: 700; transition: all .22s ease; }
+.yuuta-site .site-header nav > a:hover { transform: translateY(-2px); border-color: #a9e9ff; background: #eaf5ff; color: #2477ff; }
+.share-button { display: grid; width: 40px; height: 40px; flex-shrink: 0; place-items: center; border: 3px solid #0b1f3a; border-radius: 50%; background: #fff; color: #2477ff; box-shadow: 0 4px 0 rgba(11,31,58,.2); cursor: pointer; transition: transform .15s ease,box-shadow .15s ease,background .2s; }
+.share-button svg { width: 18px; height: 18px; }
+.share-button:hover { transform: translateY(-2px); background: #eaf5ff; }
+.share-button:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(11,31,58,.2); }
+.yuuta-site .language-switch { position: relative; display: flex; justify-self: auto; gap: 0; overflow: hidden; border: 3px solid #0b1f3a; border-radius: 999px; background: #fff; color: #2477ff; box-shadow: 0 4px 0 rgba(11,31,58,.2); cursor: pointer; font: 800 .92rem 'Baloo 2',sans-serif; transition: transform .15s ease,box-shadow .15s ease; }
+.yuuta-site .language-switch:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(11,31,58,.2); }
+.yuuta-site .language-switch button { position: relative; z-index: 2; padding: 7px 15px; border: 0; background: transparent; color: #2477ff; font: inherit; transition: color .25s ease; }
+.yuuta-site .language-switch button.active { color: #fff; }
+.language-pill { position: absolute; inset: 0 auto 0 0; z-index: 1; width: 50%; border-radius: 999px; background: linear-gradient(180deg,#55d8ff,#2477ff); transition: transform .3s cubic-bezier(.34,1.56,.64,1); }
+.language-switch[data-language='vi'] .language-pill { transform: translateX(100%); }
+.yuuta-site .hero { position: relative; z-index: 1; display: block; min-height: 589px; padding: 72px 20px 56px; overflow: visible; background: none; text-align: center; }
+.yuuta-site .hero::after { display: none; }
+.hero-logo { display: block; width: min(460px,80vw); height: auto; margin: 0 auto; border-radius: 30px; filter: drop-shadow(0 10px 0 rgba(36,119,255,.12)); mix-blend-mode: multiply; animation: yuuta-bob 4s ease-in-out infinite; }
+@keyframes yuuta-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.hero-hello { display: inline-block; margin: 26px 0 0; padding: 9px 24px; border: 3px solid #a9e9ff; border-radius: 999px; background: #fff; color: #2477ff; box-shadow: 0 6px 0 rgba(36,119,255,.16); font-size: 1.15rem; font-weight: 700; }
+.hero-tagline { margin: 16px 0 0; color: #102033; font-size: 1.28rem; font-weight: 700; }
+.hero-badges { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.hero-badge { padding: 6px 16px; border: 2.5px solid #55d8ff; border-radius: 999px; background: #eaf5ff; color: #0b1f3a; font: 800 .86rem 'Baloo 2',sans-serif; letter-spacing: .06em; cursor: pointer; transition: transform .2s cubic-bezier(.34,1.56,.64,1),background .2s,color .2s; }
+.hero-badge:hover { transform: scale(1.12) rotate(-3deg); background: #bcecff; }
+.hero-badge.active { background: linear-gradient(180deg,#55d8ff,#2477ff); color: #fff; box-shadow: 0 4px 0 rgba(11,31,58,.16); }
+.yuuta-site .hero .social-dock { justify-content: center; margin-top: 22px; }
+.yuuta-site .hero .social-dock a { width: 40px; height: 40px; border: 2.5px solid #a9e9ff; background: #fff; color: #2477ff; box-shadow: 0 4px 0 rgba(36,119,255,.14); }
+.yuuta-site .hero .social-dock a:hover { transform: translateY(-4px) rotate(-4deg); border-color: #55d8ff; background: #eaf5ff; color: #2477ff; }
+.click-spark { position: fixed; z-index: 300; color: #2477ff; font-size: 15px; pointer-events: none; user-select: none; animation: click-spark-pop .7s ease-out forwards; }
+@keyframes click-spark-pop { 0% { transform: translate(0,0) scale(0) rotate(0deg); opacity: 1; } 70% { opacity: 1; } 100% { transform: translate(var(--spark-x),var(--spark-y)) scale(1.25) rotate(160deg); opacity: 0; } }
+.site-toast { position: fixed; z-index: 200; bottom: 26px; left: 50%; padding: 11px 26px; transform: translateX(-50%); border: 3px solid #0b1f3a; border-radius: 999px; background: #fff; color: #102033; box-shadow: 0 5px 0 rgba(11,31,58,.22); font-size: 1rem; animation: yuuta-toast-in .35s cubic-bezier(.34,1.56,.64,1),yuuta-toast-out .3s ease 2.4s forwards; }
+@keyframes yuuta-toast-in { from { transform: translate(-50%,40px) scale(.7); opacity: 0; } to { transform: translate(-50%,0) scale(1); opacity: 1; } }
+@keyframes yuuta-toast-out { to { transform: translate(-50%,20px) scale(.85); opacity: 0; } }
+.yuuta-site :focus-visible { outline: 3px solid #55d8ff; outline-offset: 3px; }
+
+@media (max-width: 560px) {
+  .yuuta-site .site-header nav > a { display: none; }
+  .yuuta-site .hero { min-height: 579px; padding-top: 48px; }
+  .header-inner { padding-inline: 16px; }
+  .hero-hello { max-width: 100%; font-size: 1.05rem; line-height: 1.35; }
+}
 
 .admin-shell { min-height: 100vh; display: grid; grid-template-columns: 240px minmax(0,1fr); background: #f4f9fe; }
 .admin-sidebar { position: sticky; top: 0; display: flex; height: 100vh; flex-direction: column; padding: 30px 22px 24px; border-right: 1px solid #cfe5fa; background: #f9fcff; }
