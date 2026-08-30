@@ -1,10 +1,21 @@
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 
-export const ADMIN_EMAIL = 'vogiahuy141003@gmail.com';
+const ADMIN_EMAILS = new Set([
+  'yuuta141003@gmail.com',
+  'vogiahuy141003@gmail.com',
+]);
+
+export function isAdminEmail(email: string): boolean {
+  const normalizedEmail = email.trim().toLowerCase();
+  return (
+    ADMIN_EMAILS.has(normalizedEmail) ||
+    (process.env.NODE_ENV === 'development' &&
+      normalizedEmail === 'seedy@sites.test')
+  );
+}
 
 export async function isAdminRequest(): Promise<boolean> {
   const user = await getChatGPTUser();
   if (!user) return false;
-  const email = user.email.toLowerCase();
-  return email === ADMIN_EMAIL || (process.env.NODE_ENV === 'development' && email === 'seedy@sites.test');
+  return isAdminEmail(user.email);
 }
