@@ -695,11 +695,13 @@ body {
 .cute-contact-info strong {
   display: block;
   max-width: 225px;
-  overflow: hidden;
+  overflow: visible;
+  overflow-wrap: anywhere;
   color: var(--yuuta-ink);
   font-size: 1.02rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.25;
+  text-overflow: clip;
+  white-space: normal;
 }
 .contact-copy-icon {
   width: 16px;
@@ -1230,6 +1232,8 @@ body {
   .cute-contact-card {
     width: 100%;
     min-width: 0;
+    gap: 12px;
+    padding: 18px 16px;
   }
   .cute-contact-cards {
     grid-template-columns: 1fr;
@@ -1239,20 +1243,38 @@ body {
     grid-column: auto;
   }
   .cute-contact-info strong {
-    max-width: 58vw;
+    max-width: none;
   }
   .chat-panel {
     right: 17px;
     bottom: 92px;
   }
   .chat-fab {
+    position: absolute;
     right: 17px;
-    bottom: 17px;
+    bottom: 44px;
   }
   .video-dialog {
     width: calc(100vw - 14px);
     max-width: calc(100vw - 14px) !important;
     border-radius: 20px;
+  }
+}
+
+@media (max-width: 420px) {
+  .hero-badges {
+    display: grid;
+    width: 100%;
+    max-width: 330px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .hero-badge {
+    min-width: 0;
+    padding: 6px 4px;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
   }
 }
 

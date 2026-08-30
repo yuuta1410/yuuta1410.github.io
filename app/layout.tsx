@@ -38,6 +38,9 @@ export async function generateMetadata(): Promise<Metadata> {
     title: 'Yuuta — Motion Designer',
     description:
       'Portfolio of Võ Gia Huy (Yuuta), a motion designer based in Vietnam.',
+    icons: {
+      icon: '/favicon.svg',
+    },
     openGraph: {
       title: 'Yuuta — Motion Designer',
       description:
