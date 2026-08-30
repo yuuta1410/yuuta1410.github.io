@@ -12,7 +12,7 @@ async function database(): Promise<D1Database> {
 const defaultSettings: SiteSettings = {
   name: 'Võ Gia Huy', stageName: 'Yuuta',
   roleEn: 'Motion Designer', roleVi: 'Thiết kế chuyển động',
-  headlineEn: 'I turn ideas into motion that sticks.', headlineVi: 'Tôi biến ý tưởng thành chuyển động đáng nhớ.',
+  headlineEn: 'I turn ideas into motion that sticks.', headlineVi: 'Tôi biến ý tưởng thành chuyển động đọng lại trong tâm trí.',
   bioEn: 'I am Võ Gia Huy, also known as Yuuta — a motion designer based in Vietnam. I create energetic motion systems, anime-inspired music visuals and AI-powered commercial stories.',
   bioVi: 'Tôi là Võ Gia Huy, nghệ danh Yuuta — Motion Designer tại Việt Nam. Tôi sáng tạo hệ thống motion giàu năng lượng, hình ảnh âm nhạc lấy cảm hứng từ anime và video quảng cáo bằng AI.',
   email: 'vogiahuy141003@gmail.com', discord: 'yuuta_1410', phone: '0866406341',
@@ -83,6 +83,12 @@ export async function ensureDatabase() {
     WHERE id = 1
       AND headline_en = 'I turn ideas into motion people remember.'
   `).bind(defaultSettings.headlineEn, now).run();
+
+  await db.prepare(`UPDATE site_settings SET
+    headline_vi = ?, updated_at = ?
+    WHERE id = 1
+      AND headline_vi = 'Tôi biến ý tưởng thành chuyển động đáng nhớ.'
+  `).bind(defaultSettings.headlineVi, now).run();
 
   await db.batch(defaultSocials.map((social) => db.prepare(
     'INSERT OR IGNORE INTO social_links (id, platform, label, url, enabled, sort_order) VALUES (?, ?, ?, ?, ?, ?)',
