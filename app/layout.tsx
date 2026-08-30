@@ -19,17 +19,17 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(`${protocol}://${safeHost}`),
-    title: 'Yuuta — Motion Designer & Video Editor',
-    description: 'Portfolio of Võ Gia Huy (Yuuta), motion designer and video editor in Vietnam.',
+    title: 'Yuuta — Motion Designer',
+    description: 'Portfolio of Võ Gia Huy (Yuuta), a motion designer based in Vietnam.',
     openGraph: {
-      title: 'Yuuta — Motion Designer · Video Editor',
+      title: 'Yuuta — Motion Designer',
       description: 'Motion graphics, MV edits and AI-powered visual stories by Võ Gia Huy (Yuuta).',
       type: 'website',
-      images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Yuuta — Motion Designer · Video Editor' }],
+      images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Yuuta — Motion Designer' }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Yuuta — Motion Designer · Video Editor',
+      title: 'Yuuta — Motion Designer',
       description: 'Motion graphics, MV edits and AI-powered visual stories by Võ Gia Huy (Yuuta).',
       images: ['/og.png'],
     },

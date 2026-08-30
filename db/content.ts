@@ -11,10 +11,10 @@ async function database(): Promise<D1Database> {
 
 const defaultSettings: SiteSettings = {
   name: 'Võ Gia Huy', stageName: 'Yuuta',
-  roleEn: 'Motion Designer · Video Editor', roleVi: 'Thiết kế chuyển động · Dựng phim',
+  roleEn: 'Motion Designer', roleVi: 'Thiết kế chuyển động',
   headlineEn: 'I turn ideas into motion people remember.', headlineVi: 'Tôi biến ý tưởng thành chuyển động đáng nhớ.',
-  bioEn: 'I am Võ Gia Huy, also known as Yuuta — a motion designer and video editor based in Vietnam. I create energetic motion systems, anime-inspired music visuals and AI-powered commercial stories.',
-  bioVi: 'Tôi là Võ Gia Huy, nghệ danh Yuuta — Motion Designer và Video Editor tại Việt Nam. Tôi sáng tạo hệ thống motion giàu năng lượng, hình ảnh âm nhạc lấy cảm hứng từ anime và video quảng cáo bằng AI.',
+  bioEn: 'I am Võ Gia Huy, also known as Yuuta — a motion designer based in Vietnam. I create energetic motion systems, anime-inspired music visuals and AI-powered commercial stories.',
+  bioVi: 'Tôi là Võ Gia Huy, nghệ danh Yuuta — Motion Designer tại Việt Nam. Tôi sáng tạo hệ thống motion giàu năng lượng, hình ảnh âm nhạc lấy cảm hứng từ anime và video quảng cáo bằng AI.',
   email: 'vogiahuy141003@gmail.com', discord: 'yuuta_1410', phone: '0866406341',
 };
 
@@ -66,6 +66,16 @@ export async function ensureDatabase() {
     defaultSettings.name, defaultSettings.stageName, defaultSettings.roleEn, defaultSettings.roleVi,
     defaultSettings.headlineEn, defaultSettings.headlineVi, defaultSettings.bioEn, defaultSettings.bioVi,
     defaultSettings.email, defaultSettings.discord, defaultSettings.phone, now,
+  ).run();
+
+  await db.prepare(`UPDATE site_settings SET
+    role_en = ?, role_vi = ?, bio_en = ?, bio_vi = ?, updated_at = ?
+    WHERE id = 1
+      AND role_en = 'Motion Designer · Video Editor'
+      AND role_vi = 'Thiết kế chuyển động · Dựng phim'
+  `).bind(
+    defaultSettings.roleEn, defaultSettings.roleVi, defaultSettings.bioEn,
+    defaultSettings.bioVi, now,
   ).run();
 
   await db.batch(defaultSocials.map((social) => db.prepare(

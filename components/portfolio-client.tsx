@@ -73,7 +73,7 @@ const ui = {
       },
       {
         q: 'What kinds of videos can you create?',
-        a: 'Motion graphics: SaaS style, kinetic typography and explainers. MV Edit: anime, manga and lyric videos. AI Video: commercials, generative video and full AI production.',
+        a: 'Motion Graphics: Logo Intros, SaaS Explainer Videos, Kinetic Typography... MV Edit: Anime MVs, Manga Animation, Lyric Videos... AI Video: Short Commercials, Short Concept Visuals, fully AI-generated short videos...',
       },
       {
         q: 'I have another question.',
@@ -112,7 +112,7 @@ const ui = {
       },
       {
         q: 'Bạn có thể tạo ra những loại video nào?',
-        a: 'Motion graphics gồm SaaS style, kinetic typography và explainer. MV Edit gồm anime, manga và lyric video. AI Video gồm quảng cáo, video tạo sinh và sản xuất hoàn toàn bằng AI.',
+        a: 'Motion Graphics: Logo Intro, SaaS Explainer Video, Kinetic Typography... MV Edit: Anime MV, Manga Animation, Lyric Video... AI Video: Quảng cáo ngắn, Concept Visual ngắn, video ngắn được tạo hoàn toàn bằng AI...',
       },
       {
         q: 'Tôi có một câu hỏi khác.',
