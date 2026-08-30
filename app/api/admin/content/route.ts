@@ -45,6 +45,22 @@ function safeHttpsLink(value: unknown, allowEmpty = true): string {
   throw new Error('Use a secure HTTPS link');
 }
 
+function safeThumbnailLink(value: unknown, fallback: string): string {
+  const raw = text(value, 1000);
+  if (!raw) return fallback;
+  if (raw.startsWith('/api/thumbnail?')) {
+    const url = new URL(raw, 'https://portfolio.local');
+    const key = url.searchParams.get('key') ?? '';
+    if (
+      url.pathname === '/api/thumbnail' &&
+      /^thumbnails\/[0-9a-f-]{36}\.(?:jpg|png|webp)$/.test(key)
+    )
+      return raw;
+    throw new Error('Invalid uploaded thumbnail');
+  }
+  return safeHttpsLink(raw, false);
+}
+
 function settingsFrom(value: unknown): SiteSettings {
   const input = (value ?? {}) as Record<string, unknown>;
   const result: SiteSettings = {
@@ -98,9 +114,7 @@ function projectFrom(value: unknown): Project {
     category,
     videoUrl,
     platform: parsed.platform,
-    thumbnailUrl: customThumbnail
-      ? safeHttpsLink(customThumbnail, false)
-      : parsed.thumbnailUrl,
+    thumbnailUrl: safeThumbnailLink(customThumbnail, parsed.thumbnailUrl),
     sortOrder: number(input.sortOrder),
     published: Boolean(input.published),
     createdAt: text(input.createdAt, 100) || now,

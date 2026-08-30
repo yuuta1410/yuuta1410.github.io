@@ -2,15 +2,17 @@
 
 /* oxlint-disable next/no-html-link-for-pages -- Native anchors avoid a Vinext RSC prefetch runtime error. */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowDown,
   ArrowLeft,
   ArrowUp,
+  ImageIcon,
   Loader2,
   Plus,
   Save,
   Trash2,
+  Upload,
   Video,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -58,6 +60,25 @@ const blankProject = (sortOrder = 0): Project => ({
   updatedAt: '',
 });
 
+function thumbnailUrlError(value: string): string {
+  const raw = value.trim();
+  if (!raw) return '';
+  if (raw.startsWith('/api/thumbnail?')) {
+    const url = new URL(raw, 'https://portfolio.local');
+    const key = url.searchParams.get('key') ?? '';
+    return url.pathname === '/api/thumbnail' &&
+      /^thumbnails\/[0-9a-f-]{36}\.(?:jpg|png|webp)$/.test(key)
+      ? ''
+      : 'Invalid uploaded thumbnail.';
+  }
+  try {
+    if (new URL(raw).protocol === 'https:') return '';
+  } catch {
+    /* invalid URL */
+  }
+  return 'Use a valid HTTPS image URL.';
+}
+
 function Field({
   label,
   hint,
@@ -92,6 +113,8 @@ export function AdminClient({
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [deleteTarget, setDeleteTarget] = useState('');
+  const [thumbnailUploading, setThumbnailUploading] = useState(false);
+  const thumbnailInputRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
     try {
@@ -151,6 +174,11 @@ export function AdminClient({
     () => parseVideoUrl(project.videoUrl),
     [project.videoUrl],
   );
+  const automaticThumbnail = parsedVideo?.thumbnailUrl ?? '';
+  const hasCustomThumbnail = Boolean(
+    project.thumbnailUrl && project.thumbnailUrl !== automaticThumbnail,
+  );
+  const currentThumbnailUrlError = thumbnailUrlError(project.thumbnailUrl);
 
   const updateProjectUrl = (videoUrl: string) => {
     const parsed = parseVideoUrl(videoUrl);
@@ -170,6 +198,48 @@ export function AdminClient({
           : parsed?.thumbnailUrl || '',
       };
     });
+  };
+
+  const uploadThumbnail = async (file?: File) => {
+    if (!file) return;
+    const hasSupportedExtension = /\.(?:jpe?g|png|webp)$/i.test(file.name);
+    if (
+      !['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(
+        file.type,
+      ) &&
+      !hasSupportedExtension
+    ) {
+      setError('Use a JPG, JPEG, PNG or WebP image.');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setError('The image must be 10 MB or smaller.');
+      return;
+    }
+
+    setThumbnailUploading(true);
+    setError('');
+    setMessage('');
+    try {
+      const formData = new FormData();
+      formData.set('file', file);
+      const response = await fetch('/api/admin/thumbnail', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = (await response.json()) as { error?: string; url?: string };
+      if (!response.ok || !data.url)
+        throw new Error(data.error || 'Unable to upload thumbnail');
+      setProject((current) => ({ ...current, thumbnailUrl: data.url! }));
+      setMessage('Thumbnail uploaded. Save the project to publish it.');
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : 'Unable to upload thumbnail',
+      );
+    } finally {
+      setThumbnailUploading(false);
+      if (thumbnailInputRef.current) thumbnailInputRef.current.value = '';
+    }
   };
 
   const saveProject = async () => {
@@ -454,21 +524,91 @@ export function AdminClient({
                     }
                   />
                 </Field>
-                <Field
-                  label="Custom thumbnail URL"
-                  hint="Optional. YouTube covers are detected automatically."
-                >
-                  <Input
-                    value={project.thumbnailUrl}
-                    onChange={(event) =>
-                      setProject({
-                        ...project,
-                        thumbnailUrl: event.target.value,
-                      })
-                    }
-                    placeholder="https://…/cover.jpg"
-                  />
-                </Field>
+                <div className="admin-field admin-thumbnail-field">
+                  <span>Thumbnail</span>
+                  <div className="thumbnail-manager">
+                    <div
+                      className="thumbnail-preview"
+                      style={
+                        project.thumbnailUrl
+                          ? {
+                              backgroundImage: `url(${project.thumbnailUrl})`,
+                            }
+                          : undefined
+                      }
+                    >
+                      {!project.thumbnailUrl && (
+                        <span>
+                          <ImageIcon /> No thumbnail selected
+                        </span>
+                      )}
+                    </div>
+                    <div className="thumbnail-actions">
+                      <Input
+                        ref={thumbnailInputRef}
+                        className="thumbnail-file-input"
+                        type="file"
+                        accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                        aria-label="Upload thumbnail image"
+                        onChange={(event) =>
+                          void uploadThumbnail(event.target.files?.[0])
+                        }
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={thumbnailUploading}
+                        onClick={() => thumbnailInputRef.current?.click()}
+                      >
+                        {thumbnailUploading ? (
+                          <Loader2 className="spin" />
+                        ) : (
+                          <Upload />
+                        )}
+                        {project.thumbnailUrl ? 'Replace image' : 'Upload image'}
+                      </Button>
+                      {hasCustomThumbnail && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          disabled={thumbnailUploading}
+                          onClick={() =>
+                            setProject({
+                              ...project,
+                              thumbnailUrl: automaticThumbnail,
+                            })
+                          }
+                        >
+                          <Trash2 /> Remove image
+                        </Button>
+                      )}
+                      <small>JPG, JPEG, PNG or WebP · maximum 10 MB.</small>
+                    </div>
+                  </div>
+                  <label className="thumbnail-url-option">
+                    <span>Image URL (optional)</span>
+                    <Input
+                      value={project.thumbnailUrl}
+                      aria-invalid={Boolean(currentThumbnailUrlError)}
+                      onChange={(event) =>
+                        setProject({
+                          ...project,
+                          thumbnailUrl: event.target.value,
+                        })
+                      }
+                      placeholder="https://…/cover.jpg"
+                    />
+                    <small>
+                      Optional alternative. YouTube covers are detected
+                      automatically.
+                    </small>
+                    {currentThumbnailUrlError && (
+                      <small className="admin-field-error">
+                        {currentThumbnailUrlError}
+                      </small>
+                    )}
+                  </label>
+                </div>
                 <Field label="Display order">
                   <Input
                     type="number"
@@ -509,6 +649,8 @@ export function AdminClient({
                 <Button
                   disabled={
                     saving ||
+                    thumbnailUploading ||
+                    Boolean(currentThumbnailUrlError) ||
                     !parsedVideo ||
                     !project.titleEn ||
                     !project.titleVi
@@ -548,56 +690,69 @@ export function AdminClient({
                   }
                 />
               </Field>
-              <Field label="Role — English">
-                <Input
-                  value={settings.roleEn}
-                  onChange={(e) =>
-                    setSettings({ ...settings, roleEn: e.target.value })
-                  }
-                />
-              </Field>
-              <Field label="Role — Vietnamese">
-                <Input
-                  value={settings.roleVi}
-                  onChange={(e) =>
-                    setSettings({ ...settings, roleVi: e.target.value })
-                  }
-                />
-              </Field>
-              <Field label="Headline — English">
-                <Textarea
-                  value={settings.headlineEn}
-                  onChange={(e) =>
-                    setSettings({ ...settings, headlineEn: e.target.value })
-                  }
-                />
-              </Field>
-              <Field label="Headline — Vietnamese">
-                <Textarea
-                  value={settings.headlineVi}
-                  onChange={(e) =>
-                    setSettings({ ...settings, headlineVi: e.target.value })
-                  }
-                />
-              </Field>
-              <Field label="Biography — English">
-                <Textarea
-                  className="min-h-32"
-                  value={settings.bioEn}
-                  onChange={(e) =>
-                    setSettings({ ...settings, bioEn: e.target.value })
-                  }
-                />
-              </Field>
-              <Field label="Biography — Vietnamese">
-                <Textarea
-                  className="min-h-32"
-                  value={settings.bioVi}
-                  onChange={(e) =>
-                    setSettings({ ...settings, bioVi: e.target.value })
-                  }
-                />
-              </Field>
+              <section
+                className="profile-language-column"
+                aria-labelledby="profile-language-en"
+              >
+                <h3 id="profile-language-en">English</h3>
+                <Field label="Role — English">
+                  <Input
+                    value={settings.roleEn}
+                    onChange={(e) =>
+                      setSettings({ ...settings, roleEn: e.target.value })
+                    }
+                  />
+                </Field>
+                <Field label="Headline — English">
+                  <Textarea
+                    value={settings.headlineEn}
+                    onChange={(e) =>
+                      setSettings({ ...settings, headlineEn: e.target.value })
+                    }
+                  />
+                </Field>
+                <Field label="Biography — English">
+                  <Textarea
+                    className="min-h-32"
+                    value={settings.bioEn}
+                    onChange={(e) =>
+                      setSettings({ ...settings, bioEn: e.target.value })
+                    }
+                  />
+                </Field>
+              </section>
+              <section
+                className="profile-language-column"
+                aria-labelledby="profile-language-vi"
+                lang="vi"
+              >
+                <h3 id="profile-language-vi">Tiếng Việt</h3>
+                <Field label="Vai trò — Tiếng Việt">
+                  <Input
+                    value={settings.roleVi}
+                    onChange={(e) =>
+                      setSettings({ ...settings, roleVi: e.target.value })
+                    }
+                  />
+                </Field>
+                <Field label="Tiêu đề — Tiếng Việt">
+                  <Textarea
+                    value={settings.headlineVi}
+                    onChange={(e) =>
+                      setSettings({ ...settings, headlineVi: e.target.value })
+                    }
+                  />
+                </Field>
+                <Field label="Tiểu sử — Tiếng Việt">
+                  <Textarea
+                    className="min-h-32"
+                    value={settings.bioVi}
+                    onChange={(e) =>
+                      setSettings({ ...settings, bioVi: e.target.value })
+                    }
+                  />
+                </Field>
+              </section>
               <Field label="Contact email">
                 <Input
                   type="email"
