@@ -1,5 +1,7 @@
 'use client';
 
+/* oxlint-disable next/no-html-link-for-pages -- Native anchors avoid a Vinext RSC prefetch runtime error. */
+
 import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowDown,
@@ -11,7 +13,6 @@ import {
   Trash2,
   Video,
 } from 'lucide-react';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -245,9 +246,9 @@ export function AdminClient({
     <main className="admin-shell">
       <aside className="admin-sidebar">
         <div>
-          <Link className="mini-brand" href="/">
+          <a className="mini-brand" href="/">
             YUUTA<span>®</span>
-          </Link>
+          </a>
           <p>Portfolio settings</p>
         </div>
         <nav aria-label="Settings sections">
@@ -287,7 +288,7 @@ export function AdminClient({
           <Button
             variant="outline"
             nativeButton={false}
-            render={<Link href="/" aria-label="View website" />}
+            render={<a href="/" aria-label="View website" />}
           >
             <ArrowLeft /> View website
           </Button>
