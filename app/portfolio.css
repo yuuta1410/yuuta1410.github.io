@@ -626,14 +626,16 @@ body {
 }
 
 .cute-contact-cards {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+  display: grid;
+  width: min(780px, 100%);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 22px;
+  margin: 0 auto;
 }
 .cute-contact-card {
   display: flex;
-  min-width: 290px;
+  width: 100%;
+  min-width: 0;
   align-items: center;
   gap: 16px;
   padding: 20px 24px;
@@ -649,6 +651,11 @@ body {
     transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
     border-color 0.25s,
     box-shadow 0.25s;
+}
+.contact-card-centered {
+  width: calc(50% - 11px);
+  grid-column: 1 / -1;
+  justify-self: center;
 }
 .cute-contact-card:hover {
   transform: translateY(-6px) rotate(0.8deg);
@@ -1216,6 +1223,13 @@ body {
   .cute-contact-card {
     width: 100%;
     min-width: 0;
+  }
+  .cute-contact-cards {
+    grid-template-columns: 1fr;
+  }
+  .contact-card-centered {
+    width: 100%;
+    grid-column: auto;
   }
   .cute-contact-info strong {
     max-width: 58vw;

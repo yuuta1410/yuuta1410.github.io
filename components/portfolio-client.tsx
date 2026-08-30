@@ -332,14 +332,19 @@ function ContactCard({
   label,
   value,
   onCopy,
+  centered = false,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
   onCopy: () => void;
+  centered?: boolean;
 }) {
   return (
-    <button className="cute-contact-card reveal-item" onClick={onCopy}>
+    <button
+      className={`cute-contact-card reveal-item${centered ? ' contact-card-centered' : ''}`}
+      onClick={onCopy}
+    >
       <span className="cute-contact-icon">{icon}</span>
       <span className="cute-contact-info">
         <b>{label}</b>
@@ -736,12 +741,6 @@ export function PortfolioClient({
         <p className="cute-section-sub">{t.contactSub}</p>
         <div className="cute-contact-cards">
           <ContactCard
-            icon={<SiGmail />}
-            label="E-MAIL"
-            value={settings.email}
-            onCopy={() => void copyText(settings.email)}
-          />
-          <ContactCard
             icon={<SiZalo />}
             label="ZALO"
             value={settings.phone}
@@ -752,6 +751,13 @@ export function PortfolioClient({
             label="WHATSAPP"
             value={settings.phone}
             onCopy={() => void copyText(settings.phone)}
+          />
+          <ContactCard
+            icon={<SiGmail />}
+            label="E-MAIL"
+            value={settings.email}
+            onCopy={() => void copyText(settings.email)}
+            centered
           />
         </div>
       </section>

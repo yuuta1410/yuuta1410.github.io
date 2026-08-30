@@ -488,7 +488,7 @@ export function AdminClient({
           <div className="admin-panel profile-editor">
             <div className="panel-title">
               <div>
-                <h2>Identity & biography</h2>
+                <h2>Identity, biography & contact</h2>
                 <p>English is the default public language.</p>
               </div>
             </div>
@@ -559,7 +559,7 @@ export function AdminClient({
                   }
                 />
               </Field>
-              <Field label="Email">
+              <Field label="Contact email">
                 <Input
                   type="email"
                   value={settings.email}
@@ -568,7 +568,7 @@ export function AdminClient({
                   }
                 />
               </Field>
-              <Field label="Phone used by Zalo & WhatsApp">
+              <Field label="Contact phone — used by Zalo & WhatsApp">
                 <Input
                   value={settings.phone}
                   onChange={(e) =>
