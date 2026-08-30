@@ -5,13 +5,13 @@ import {
   ArrowDown,
   ArrowLeft,
   ArrowUp,
-  ExternalLink,
   Loader2,
   Plus,
   Save,
   Trash2,
   Video,
 } from 'lucide-react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -30,6 +30,11 @@ import type {
   SiteSettings,
   SocialLink,
 } from '@/lib/types';
+import { SocialGlyph } from '@/components/social-glyph';
+import {
+  normalizeSocialPlatform,
+  socialPlatformSuggestions,
+} from '@/lib/socials';
 import { parseVideoUrl, platformName } from '@/lib/video';
 
 type AdminSection = 'projects' | 'profile' | 'socials';
@@ -106,7 +111,8 @@ export function AdminClient({
   };
 
   useEffect(() => {
-    void load();
+    const task = window.setTimeout(() => void load(), 0);
+    return () => window.clearTimeout(task);
   }, []);
 
   const send = async (payload: Record<string, unknown>, success: string) => {
@@ -147,12 +153,22 @@ export function AdminClient({
 
   const updateProjectUrl = (videoUrl: string) => {
     const parsed = parseVideoUrl(videoUrl);
-    setProject((current) => ({
-      ...current,
-      videoUrl,
-      platform: parsed?.platform ?? current.platform,
-      thumbnailUrl: current.thumbnailUrl || parsed?.thumbnailUrl || '',
-    }));
+    setProject((current) => {
+      const previousAutoThumbnail = parseVideoUrl(
+        current.videoUrl,
+      )?.thumbnailUrl;
+      const hasCustomThumbnail = Boolean(
+        current.thumbnailUrl && current.thumbnailUrl !== previousAutoThumbnail,
+      );
+      return {
+        ...current,
+        videoUrl,
+        platform: parsed?.platform ?? current.platform,
+        thumbnailUrl: hasCustomThumbnail
+          ? current.thumbnailUrl
+          : parsed?.thumbnailUrl || '',
+      };
+    });
   };
 
   const saveProject = async () => {
@@ -194,6 +210,27 @@ export function AdminClient({
       }));
     });
   };
+  const addSocial = () => {
+    const id = `custom-${crypto.randomUUID()}`;
+    setSocials((current) => [
+      ...current,
+      {
+        id,
+        platform: '',
+        label: '',
+        url: '',
+        enabled: false,
+        sortOrder: current.length + 1,
+      },
+    ]);
+  };
+  const removeSocial = (id: string) => {
+    setSocials((current) =>
+      current
+        .filter((item) => item.id !== id)
+        .map((item, index) => ({ ...item, sortOrder: index + 1 })),
+    );
+  };
 
   if (!content || !settings) {
     return (
@@ -208,9 +245,9 @@ export function AdminClient({
     <main className="admin-shell">
       <aside className="admin-sidebar">
         <div>
-          <a className="mini-brand" href="/">
+          <Link className="mini-brand" href="/">
             YUUTA<span>®</span>
-          </a>
+          </Link>
           <p>Portfolio settings</p>
         </div>
         <nav aria-label="Settings sections">
@@ -250,16 +287,16 @@ export function AdminClient({
           <Button
             variant="outline"
             nativeButton={false}
-            render={<a href="/" />}
+            render={<Link href="/" aria-label="View website" />}
           >
             <ArrowLeft /> View website
           </Button>
         </header>
 
         {(message || error) && (
-          <div role="status" className={`admin-notice ${error ? 'error' : ''}`}>
+          <output className={`admin-notice ${error ? 'error' : ''}`}>
             {error || message}
-          </div>
+          </output>
         )}
 
         {section === 'projects' && (
@@ -445,18 +482,19 @@ export function AdminClient({
                   />
                 </Field>
               </div>
-              <label className="publish-row">
+              <div className="publish-row">
                 <span>
                   <strong>Published</strong>
                   <small>Show this project on the public website.</small>
                 </span>
                 <Switch
+                  aria-label="Publish this project"
                   checked={project.published}
                   onCheckedChange={(checked) =>
                     setProject({ ...project, published: checked })
                   }
                 />
-              </label>
+              </div>
               <div className="editor-actions">
                 {project.id && (
                   <Button
@@ -603,23 +641,45 @@ export function AdminClient({
                   MV EDIT and AI VIDEO tabs.
                 </p>
               </div>
+              <Button size="sm" onClick={addSocial}>
+                <Plus /> New
+              </Button>
             </div>
+            <datalist id="social-platform-suggestions">
+              {socialPlatformSuggestions.map((platform) => (
+                <option value={platform} key={platform}>
+                  {platform}
+                </option>
+              ))}
+            </datalist>
             <div className="social-settings-list">
               {socials.map((social, index) => (
                 <div className="social-setting" key={social.id}>
                   <span className="social-setting-icon">
-                    {social.label.slice(0, 2).toUpperCase()}
+                    <SocialGlyph platform={social.platform} />
                   </span>
                   <Input
+                    value={social.platform}
+                    list="social-platform-suggestions"
+                    aria-label={`${social.label || 'New social'} platform`}
+                    onChange={(e) =>
+                      updateSocial(social.id, {
+                        platform: normalizeSocialPlatform(e.target.value),
+                      })
+                    }
+                    placeholder="Platform"
+                  />
+                  <Input
                     value={social.label}
-                    aria-label={`${social.platform} label`}
+                    aria-label={`${social.platform || 'New social'} label`}
                     onChange={(e) =>
                       updateSocial(social.id, { label: e.target.value })
                     }
+                    placeholder="Label"
                   />
                   <Input
                     value={social.url}
-                    aria-label={`${social.platform} link`}
+                    aria-label={`${social.platform || 'New social'} link`}
                     onChange={(e) =>
                       updateSocial(social.id, { url: e.target.value })
                     }
@@ -652,6 +712,14 @@ export function AdminClient({
                     }
                     aria-label={`Show ${social.label}`}
                   />
+                  <Button
+                    size="icon-sm"
+                    variant="ghost"
+                    aria-label={`Remove ${social.label || 'social link'}`}
+                    onClick={() => removeSocial(social.id)}
+                  >
+                    <Trash2 />
+                  </Button>
                 </div>
               ))}
             </div>

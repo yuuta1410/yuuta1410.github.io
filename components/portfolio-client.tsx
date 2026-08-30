@@ -3,20 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowDown, Copy, ExternalLink, Link2, Play } from 'lucide-react';
-import type { IconType } from 'react-icons';
-import {
-  SiBilibili,
-  SiDiscord,
-  SiGmail,
-  SiInstagram,
-  SiPayhip,
-  SiThreads,
-  SiTiktok,
-  SiWhatsapp,
-  SiX,
-  SiYoutube,
-  SiZalo,
-} from 'react-icons/si';
+import { SiGmail, SiWhatsapp, SiZalo } from 'react-icons/si';
 import {
   Dialog,
   DialogContent,
@@ -37,6 +24,7 @@ import type {
   Project,
   SocialLink,
 } from '@/lib/types';
+import { SocialGlyph } from '@/components/social-glyph';
 import { parseVideoUrl, platformName } from '@/lib/video';
 
 const categories: Category[] = ['MOTION', 'MV EDIT', 'AI VIDEO'];
@@ -44,7 +32,18 @@ const categories: Category[] = ['MOTION', 'MV EDIT', 'AI VIDEO'];
 const ui = {
   en: {
     work: 'Works',
+    worksTitle: 'WORKS',
     contact: 'Contact',
+    contactTitle: 'CONTACT',
+    navLabel: 'Main navigation',
+    homeLabel: 'Yuuta home',
+    languageLabel: 'Language',
+    categoriesLabel: 'Project categories',
+    socialLabel: 'Social links',
+    closeChat: 'Close chat',
+    openChat: 'FAQ chat',
+    backToTop: 'Back to top',
+    copyContact: 'Copy',
     share: 'Share',
     shared: 'Website link copied!',
     hello: 'Hi! I’m Yuuta',
@@ -57,6 +56,7 @@ const ui = {
     contactSub:
       'For commissions and collaboration, tap a card to copy the contact.',
     copied: 'Copied to clipboard!',
+    copyFailed: 'Could not copy. Please copy it manually.',
     watchOn: 'Watch on',
     unavailable: 'This video cannot be embedded.',
     botName: 'YUUTA BOT',
@@ -73,7 +73,7 @@ const ui = {
       },
       {
         q: 'What kinds of videos can you create?',
-        a: 'Motion Graphics: Logo Intros, SaaS Explainer Videos, Kinetic Typography... MV Edit: Anime MVs, Manga Animation, Lyric Videos... AI Video: Short Commercials, Short Concept Visuals, fully AI-generated short videos...',
+        a: 'Motion Graphics: Logo Intro, SaaS Explainer Video, Kinetic Typography... MV Edit: Anime MV, Manga Animation, Lyric Video... AI Video: Short Commercials, Short Concept Visuals, fully AI-generated short videos...',
       },
       {
         q: 'I have another question.',
@@ -83,7 +83,18 @@ const ui = {
   },
   vi: {
     work: 'Tác phẩm',
+    worksTitle: 'TÁC PHẨM',
     contact: 'Liên hệ',
+    contactTitle: 'LIÊN HỆ',
+    navLabel: 'Điều hướng chính',
+    homeLabel: 'Trang chủ Yuuta',
+    languageLabel: 'Ngôn ngữ',
+    categoriesLabel: 'Danh mục dự án',
+    socialLabel: 'Liên kết mạng xã hội',
+    closeChat: 'Đóng trò chuyện',
+    openChat: 'Trò chuyện hỏi đáp',
+    backToTop: 'Về đầu trang',
+    copyContact: 'Sao chép',
     share: 'Chia sẻ',
     shared: 'Đã sao chép liên kết website!',
     hello: 'Xin chào! Mình là Yuuta',
@@ -96,6 +107,7 @@ const ui = {
     contactSub:
       'Để đặt dự án hoặc hợp tác, hãy bấm vào thẻ để sao chép liên hệ.',
     copied: 'Đã sao chép!',
+    copyFailed: 'Không thể sao chép. Vui lòng sao chép thủ công.',
     watchOn: 'Xem trên',
     unavailable: 'Video này không thể nhúng trực tiếp.',
     botName: 'YUUTA BOT',
@@ -137,35 +149,17 @@ const backgroundDecorations = [
   ['✦', '82%', '92%', '24px', '2.4s', '7s'],
 ] as const;
 
-const socialIcons: Record<string, IconType> = {
-  bilibili: SiBilibili,
-  discord: SiDiscord,
-  douyin: SiTiktok,
-  gmail: SiGmail,
-  instagram: SiInstagram,
-  payhip: SiPayhip,
-  threads: SiThreads,
-  tiktok: SiTiktok,
-  whatsapp: SiWhatsapp,
-  x: SiX,
-  youtube: SiYoutube,
-  zalo: SiZalo,
-};
-
-function SocialGlyph({ platform }: { platform: string }) {
-  const BrandIcon = socialIcons[platform.toLowerCase()];
-  return BrandIcon ? (
-    <BrandIcon aria-hidden="true" />
-  ) : (
-    <ExternalLink aria-hidden="true" />
-  );
-}
-
-function SocialDock({ socials }: { socials: SocialLink[] }) {
+function SocialDock({
+  socials,
+  ariaLabel,
+}: {
+  socials: SocialLink[];
+  ariaLabel: string;
+}) {
   if (!socials.length) return null;
   return (
     <TooltipProvider delay={250}>
-      <div className="social-dock" aria-label="Social links">
+      <div className="social-dock" aria-label={ariaLabel}>
         {socials.map((social) => {
           const external =
             !social.url.startsWith('mailto:') && !social.url.startsWith('tel:');
@@ -283,7 +277,11 @@ function VideoDialog({
     : '';
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="video-dialog" aria-label={title}>
+      <DialogContent
+        className="video-dialog"
+        aria-label={title}
+        closeLabel={language === 'en' ? 'Close' : 'Đóng'}
+      >
         <DialogHeader className="video-dialog-header">
           <span className="window-dot dark" />
           <span className="window-dot cyan" />
@@ -332,18 +330,21 @@ function ContactCard({
   label,
   value,
   onCopy,
+  actionLabel,
   centered = false,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
   onCopy: () => void;
+  actionLabel: string;
   centered?: boolean;
 }) {
   return (
     <button
       className={`cute-contact-card reveal-item${centered ? ' contact-card-centered' : ''}`}
       onClick={onCopy}
+      aria-label={`${actionLabel} ${label}: ${value}`}
     >
       <span className="cute-contact-icon">{icon}</span>
       <span className="cute-contact-info">
@@ -371,15 +372,12 @@ function YuutaBot({
   const [typing, setTyping] = useState(false);
   const answerTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    setQuestion('');
-    setAnswer('');
-    setTyping(false);
-    if (answerTimer.current) clearTimeout(answerTimer.current);
-    return () => {
+  useEffect(
+    () => () => {
       if (answerTimer.current) clearTimeout(answerTimer.current);
-    };
-  }, [language]);
+    },
+    [],
+  );
 
   const ask = (nextQuestion: string, nextAnswer: string) => {
     if (answerTimer.current) clearTimeout(answerTimer.current);
@@ -413,7 +411,7 @@ function YuutaBot({
           />
           <b>{t.botName}</b>
           <span>{t.online}</span>
-          <button onClick={() => setOpen(false)} aria-label="Close chat">
+          <button onClick={() => setOpen(false)} aria-label={t.closeChat}>
             ×
           </button>
         </div>
@@ -440,7 +438,7 @@ function YuutaBot({
       <button
         className="chat-fab"
         onClick={() => setOpen((value) => !value)}
-        aria-label="FAQ chat"
+        aria-label={t.openChat}
         aria-expanded={open}
       >
         <Image
@@ -457,10 +455,12 @@ function YuutaBot({
 
 export function PortfolioClient({
   initialContent,
+  initialLanguage,
 }: {
   initialContent: PortfolioContent;
+  initialLanguage: Language;
 }) {
-  const [language, setLanguage] = useState<Language>('en');
+  const [language, setLanguage] = useState<Language>(initialLanguage);
   const [category, setCategory] = useState<Category>('MOTION');
   const [visible, setVisible] = useState(6);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -544,23 +544,22 @@ export function PortfolioClient({
     toastTimer.current = setTimeout(() => setToastMessage(''), 2800);
   };
 
-  const copyText = async (value: string) => {
+  const copyText = async (value: string, successMessage = t.copied) => {
     try {
       await navigator.clipboard.writeText(value);
+      showToast(successMessage);
     } catch {
-      const textarea = document.createElement('textarea');
-      textarea.value = value;
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand('copy');
-      textarea.remove();
+      showToast(t.copyFailed);
     }
-    showToast(t.copied);
   };
 
   const shareWebsite = async () => {
-    await copyText(window.location.origin);
-    showToast(t.shared);
+    await copyText(window.location.origin, t.shared);
+  };
+
+  const changeLanguage = (nextLanguage: Language) => {
+    setLanguage(nextLanguage);
+    document.cookie = `yuuta-language=${nextLanguage}; Path=/; Max-Age=31536000; SameSite=Lax`;
   };
 
   const changeCategory = (next: Category, scroll = false) => {
@@ -612,7 +611,7 @@ export function PortfolioClient({
 
       <header className="site-header">
         <div className="header-inner">
-          <a className="header-brand" href="#top" aria-label="Yuuta home">
+          <a className="header-brand" href="#top" aria-label={t.homeLabel}>
             <Image
               src="/yuuta-logo-sapphire-v5.png"
               alt="Yuuta"
@@ -621,7 +620,7 @@ export function PortfolioClient({
               priority
             />
           </a>
-          <nav aria-label="Main navigation">
+          <nav aria-label={t.navLabel}>
             <a href="#work">{t.work}</a>
             <a href="#contact">{t.contact}</a>
             <button
@@ -634,19 +633,19 @@ export function PortfolioClient({
             <div
               className="language-switch"
               data-language={language}
-              aria-label="Language"
+              aria-label={t.languageLabel}
             >
               <span className="language-pill" />
               <button
                 className={language === 'en' ? 'active' : ''}
-                onClick={() => setLanguage('en')}
+                onClick={() => changeLanguage('en')}
                 aria-pressed={language === 'en'}
               >
                 EN
               </button>
               <button
                 className={language === 'vi' ? 'active' : ''}
-                onClick={() => setLanguage('vi')}
+                onClick={() => changeLanguage('vi')}
                 aria-pressed={language === 'vi'}
               >
                 VI
@@ -669,11 +668,11 @@ export function PortfolioClient({
           {t.hello} — {role} ✦
         </p>
         <p className="hero-tagline">{headline} ✦</p>
-        <SocialDock socials={socials} />
+        <SocialDock socials={socials} ariaLabel={t.socialLabel} />
         <div
           className="hero-badges"
           role="tablist"
-          aria-label="Project categories"
+          aria-label={t.categoriesLabel}
         >
           {categories.map((item) => (
             <button
@@ -690,7 +689,7 @@ export function PortfolioClient({
       </section>
 
       <section className="cute-section works-section" id="work">
-        <SectionTitle>WORKS</SectionTitle>
+        <SectionTitle>{t.worksTitle}</SectionTitle>
         {shown.length ? (
           <>
             <div className="portfolio-grid">
@@ -737,7 +736,7 @@ export function PortfolioClient({
       </section>
 
       <section className="cute-section contact-cute-section" id="contact">
-        <SectionTitle>CONTACT</SectionTitle>
+        <SectionTitle>{t.contactTitle}</SectionTitle>
         <p className="cute-section-sub">{t.contactSub}</p>
         <div className="cute-contact-cards">
           <ContactCard
@@ -745,18 +744,21 @@ export function PortfolioClient({
             label="ZALO"
             value={settings.phone}
             onCopy={() => void copyText(settings.phone)}
+            actionLabel={t.copyContact}
           />
           <ContactCard
             icon={<SiWhatsapp />}
             label="WHATSAPP"
             value={settings.phone}
             onCopy={() => void copyText(settings.phone)}
+            actionLabel={t.copyContact}
           />
           <ContactCard
             icon={<SiGmail />}
             label="E-MAIL"
             value={settings.email}
             onCopy={() => void copyText(settings.email)}
+            actionLabel={t.copyContact}
             centered
           />
         </div>
@@ -766,7 +768,7 @@ export function PortfolioClient({
         <button
           className="footer-flame"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          aria-label="Back to top"
+          aria-label={t.backToTop}
         >
           <Image
             src="/yuuta-flame-sapphire-v3.png"
@@ -784,15 +786,12 @@ export function PortfolioClient({
         language={language}
       />
       <YuutaBot
+        key={language}
         language={language}
         email={settings.email}
         phone={settings.phone}
       />
-      {toastMessage && (
-        <div className="site-toast" role="status">
-          ✦ {toastMessage}
-        </div>
-      )}
+      {toastMessage && <output className="site-toast">✦ {toastMessage}</output>}
     </main>
   );
 }

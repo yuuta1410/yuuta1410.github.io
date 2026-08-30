@@ -1591,7 +1591,10 @@ body {
 }
 .social-setting {
   display: grid;
-  grid-template-columns: 42px minmax(110px, 0.35fr) minmax(240px, 1fr) auto auto;
+  grid-template-columns: 42px minmax(110px, 0.32fr) minmax(
+      110px,
+      0.32fr
+    ) minmax(240px, 1fr) auto auto auto;
   align-items: center;
   gap: 10px;
   min-height: 64px;
@@ -1609,6 +1612,10 @@ body {
   background: linear-gradient(135deg, #2477ff, #55d8ff);
   color: white;
   font: 800 0.62rem var(--font-geist-mono);
+}
+.social-setting-icon svg {
+  width: 17px;
+  height: 17px;
 }
 .social-order {
   display: flex;
@@ -1683,10 +1690,13 @@ body {
     position: static;
   }
   .admin-shell {
-    grid-template-columns: 1fr;
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr);
   }
   .admin-sidebar {
     position: static;
+    width: 100%;
+    min-width: 0;
     height: auto;
     flex-direction: row;
     align-items: center;
@@ -1825,10 +1835,10 @@ body {
     padding: 8px 14px;
   }
   .social-setting {
-    grid-template-columns: 38px 1fr auto;
+    grid-template-columns: 38px minmax(0, 1fr) minmax(0, 1fr) auto;
     padding: 12px 0;
   }
-  .social-setting > input:nth-of-type(2) {
+  .social-setting > input:nth-of-type(3) {
     grid-column: 1/-1;
   }
   .social-order {
