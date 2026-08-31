@@ -527,7 +527,7 @@ async function cacheProviderThumbnail(
   const parsed = parseVideoUrl(videoUrl);
   if (!parsed || !sourceUrl) return '';
   const response = await fetch(sourceUrl, {
-    headers: { accept: 'image/avif,image/webp,image/png,image/jpeg' },
+    headers: { accept: 'image/webp,image/png,image/jpeg' },
   });
   if (!response.ok) return '';
   const declaredLength = Number(response.headers.get('content-length') || 0);
