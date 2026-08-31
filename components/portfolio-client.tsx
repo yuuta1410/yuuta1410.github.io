@@ -274,6 +274,7 @@ function VideoDialog({
   language: Language;
 }) {
   const parsed = project ? parseVideoUrl(project.videoUrl) : null;
+  const playerRef = useRef<HTMLIFrameElement>(null);
   const title = project
     ? language === 'en'
       ? project.titleEn
@@ -284,6 +285,45 @@ function VideoDialog({
       ? project.descriptionEn
       : project.descriptionVi
     : '';
+
+  useEffect(() => {
+    if (!open || parsed?.platform !== 'tiktok') return;
+
+    const requestPlaybackWithSound = () => {
+      const player = playerRef.current?.contentWindow;
+      if (!player) return;
+      const targetOrigin = 'https://www.tiktok.com';
+      player.postMessage(
+        { type: 'unMute', value: undefined, 'x-tiktok-player': true },
+        targetOrigin,
+      );
+      player.postMessage(
+        { type: 'play', value: undefined, 'x-tiktok-player': true },
+        targetOrigin,
+      );
+    };
+
+    const handlePlayerMessage = (event: MessageEvent) => {
+      if (
+        event.origin !== 'https://www.tiktok.com' ||
+        event.source !== playerRef.current?.contentWindow
+      )
+        return;
+      const message = event.data as {
+        type?: string;
+        'x-tiktok-player'?: boolean;
+      };
+      if (
+        message?.['x-tiktok-player'] === true &&
+        message.type === 'onPlayerReady'
+      )
+        requestPlaybackWithSound();
+    };
+
+    window.addEventListener('message', handlePlayerMessage);
+    return () => window.removeEventListener('message', handlePlayerMessage);
+  }, [open, parsed?.id, parsed?.platform]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -306,11 +346,28 @@ function VideoDialog({
         {open && project && parsed ? (
           <div className={`player-shell ${parsed.vertical ? 'vertical' : ''}`}>
             <iframe
+              ref={playerRef}
               key={parsed.embedUrl}
               src={parsed.embedUrl}
               title={title}
               allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
               allowFullScreen
+              onLoad={() => {
+                if (parsed.platform !== 'tiktok') return;
+                const player = playerRef.current?.contentWindow;
+                player?.postMessage(
+                  {
+                    type: 'unMute',
+                    value: undefined,
+                    'x-tiktok-player': true,
+                  },
+                  'https://www.tiktok.com',
+                );
+                player?.postMessage(
+                  { type: 'play', value: undefined, 'x-tiktok-player': true },
+                  'https://www.tiktok.com',
+                );
+              }}
             />
           </div>
         ) : open && project ? (

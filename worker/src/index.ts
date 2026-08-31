@@ -29,6 +29,8 @@ const categories: Category[] = [
   'Other',
 ];
 const maxThumbnailSize = 10 * 1024 * 1024;
+const thumbnailKeyPattern =
+  /^thumbnails\/(?:[0-9a-f-]{36}|auto-(?:youtube|vimeo|tiktok|instagram)-[A-Za-z0-9_-]{1,100})\.(?:jpg|png|webp)$/;
 
 function securityHeaders(headers = new Headers()): Headers {
   headers.set('x-content-type-options', 'nosniff');
@@ -489,8 +491,98 @@ async function uploadThumbnail(request: Request, env: Env): Promise<Response> {
   }
 }
 
+async function providerThumbnail(videoUrl: string): Promise<string> {
+  const parsed = parseVideoUrl(videoUrl);
+  if (!parsed) return '';
+  if (parsed.thumbnailUrl) return parsed.thumbnailUrl;
+
+  const endpoint =
+    parsed.platform === 'tiktok'
+      ? `https://www.tiktok.com/oembed?url=${encodeURIComponent(videoUrl)}`
+      : parsed.platform === 'vimeo'
+        ? `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(videoUrl)}`
+        : parsed.platform === 'instagram'
+          ? `https://www.instagram.com/oembed/?url=${encodeURIComponent(videoUrl)}&omitscript=true`
+          : '';
+  if (!endpoint) return '';
+
+  const response = await fetch(endpoint, {
+    headers: { accept: 'application/json', 'user-agent': 'yuuta-portfolio' },
+  });
+  if (!response.ok || !response.headers.get('content-type')?.includes('json'))
+    return '';
+  const data = (await response.json()) as { thumbnail_url?: unknown };
+  return typeof data.thumbnail_url === 'string' &&
+    data.thumbnail_url.startsWith('https://')
+    ? data.thumbnail_url
+    : '';
+}
+
+async function cacheProviderThumbnail(
+  request: Request,
+  env: Env,
+  videoUrl: string,
+  sourceUrl: string,
+): Promise<string> {
+  const parsed = parseVideoUrl(videoUrl);
+  if (!parsed || !sourceUrl) return '';
+  const response = await fetch(sourceUrl, {
+    headers: { accept: 'image/avif,image/webp,image/png,image/jpeg' },
+  });
+  if (!response.ok) return '';
+  const declaredLength = Number(response.headers.get('content-length') || 0);
+  if (declaredLength > maxThumbnailSize) return '';
+  const buffer = await response.arrayBuffer();
+  if (!buffer.byteLength || buffer.byteLength > maxThumbnailSize) return '';
+  const detected = detectedImageType(new Uint8Array(buffer));
+  if (!detected) return '';
+  const key = `thumbnails/auto-${parsed.platform}-${parsed.id}.${detected.extension}`;
+  await env.MEDIA.put(key, buffer, {
+    metadata: { contentType: detected.contentType },
+  });
+  return `${new URL(request.url).origin}/media/${key}`;
+}
+
+async function resolveThumbnail(request: Request, env: Env): Promise<Response> {
+  try {
+    const body = (await request.json()) as JsonRecord;
+    const videoUrl = safeHttpsLink(body.videoUrl, false);
+    const parsed = parseVideoUrl(videoUrl);
+    if (!parsed)
+      throw new Error(
+        'Use a valid YouTube, Vimeo, TikTok or Instagram video link',
+      );
+    const sourceUrl = await providerThumbnail(videoUrl);
+    if (!sourceUrl)
+      return json(request, env, { ok: true, url: '', fallback: true });
+    const cachedUrl = await cacheProviderThumbnail(
+      request,
+      env,
+      videoUrl,
+      sourceUrl,
+    );
+    return json(request, env, {
+      ok: true,
+      url: cachedUrl || sourceUrl,
+      fallback: !cachedUrl,
+    });
+  } catch (error) {
+    return json(
+      request,
+      env,
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Unable to detect thumbnail',
+      },
+      400,
+    );
+  }
+}
+
 async function media(request: Request, env: Env, key: string): Promise<Response> {
-  if (!/^thumbnails\/[0-9a-f-]{36}\.(?:jpg|png|webp)$/.test(key))
+  if (!thumbnailKeyPattern.test(key))
     return new Response('Invalid thumbnail', { status: 400, headers: securityHeaders() });
   const object = await env.MEDIA.getWithMetadata<{ contentType?: string }>(key, 'arrayBuffer');
   if (!object.value) return new Response('Thumbnail not found', { status: 404, headers: securityHeaders() });
@@ -544,6 +636,10 @@ export default {
       if (request.method === 'POST' && url.pathname === '/api/admin/thumbnail') {
         if (!(await authorized(request, env))) return json(request, env, { error: 'Unauthorized' }, 401);
         return uploadThumbnail(request, env);
+      }
+      if (request.method === 'POST' && url.pathname === '/api/admin/thumbnail/resolve') {
+        if (!(await authorized(request, env))) return json(request, env, { error: 'Unauthorized' }, 401);
+        return resolveThumbnail(request, env);
       }
       if (request.method === 'GET' && url.pathname.startsWith('/media/'))
         return media(request, env, decodeURIComponent(url.pathname.slice('/media/'.length)));

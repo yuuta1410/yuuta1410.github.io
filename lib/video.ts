@@ -43,7 +43,7 @@ export function parseVideoUrl(input: string): ParsedVideo | null {
     if (!id || !/^\d+$/.test(id)) return null;
     return {
       platform: 'tiktok', id,
-      embedUrl: `https://www.tiktok.com/player/v1/${id}?autoplay=1&loop=0&rel=0&music_info=0&description=0`,
+      embedUrl: `https://www.tiktok.com/player/v1/${id}?autoplay=1&loop=0&rel=0&music_info=0&description=0&muted=0&volume_control=1`,
       thumbnailUrl: '', vertical: true,
     };
   }

@@ -694,14 +694,14 @@ body {
 }
 .cute-contact-info strong {
   display: block;
-  max-width: 225px;
+  max-width: none;
   overflow: visible;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
   color: var(--yuuta-ink);
   font-size: 1.02rem;
   line-height: 1.25;
   text-overflow: clip;
-  white-space: normal;
+  white-space: nowrap;
 }
 .contact-copy-icon {
   width: 16px;
@@ -1244,6 +1244,8 @@ body {
   }
   .cute-contact-info strong {
     max-width: none;
+    overflow-wrap: anywhere;
+    white-space: normal;
   }
   .chat-panel {
     right: 17px;

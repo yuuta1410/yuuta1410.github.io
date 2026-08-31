@@ -115,6 +115,11 @@ export function AdminClient({
   const [error, setError] = useState('');
   const [deleteTarget, setDeleteTarget] = useState('');
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
+  const [thumbnailResolving, setThumbnailResolving] = useState(false);
+  const [resolvedThumbnail, setResolvedThumbnail] = useState({
+    videoUrl: '',
+    url: '',
+  });
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
@@ -176,7 +181,11 @@ export function AdminClient({
     () => parseVideoUrl(project.videoUrl),
     [project.videoUrl],
   );
-  const automaticThumbnail = parsedVideo?.thumbnailUrl ?? '';
+  const automaticThumbnail =
+    parsedVideo?.thumbnailUrl ||
+    (resolvedThumbnail.videoUrl === project.videoUrl
+      ? resolvedThumbnail.url
+      : '');
   const hasCustomThumbnail = Boolean(
     project.thumbnailUrl && project.thumbnailUrl !== automaticThumbnail,
   );
@@ -185,9 +194,11 @@ export function AdminClient({
   const updateProjectUrl = (videoUrl: string) => {
     const parsed = parseVideoUrl(videoUrl);
     setProject((current) => {
-      const previousAutoThumbnail = parseVideoUrl(
-        current.videoUrl,
-      )?.thumbnailUrl;
+      const previousAutoThumbnail =
+        parseVideoUrl(current.videoUrl)?.thumbnailUrl ||
+        (resolvedThumbnail.videoUrl === current.videoUrl
+          ? resolvedThumbnail.url
+          : '');
       const hasCustomThumbnail = Boolean(
         current.thumbnailUrl && current.thumbnailUrl !== previousAutoThumbnail,
       );
@@ -200,7 +211,63 @@ export function AdminClient({
           : parsed?.thumbnailUrl || '',
       };
     });
+    if (videoUrl !== resolvedThumbnail.videoUrl)
+      setResolvedThumbnail({ videoUrl: '', url: '' });
   };
+
+  useEffect(() => {
+    if (
+      !parsedVideo ||
+      parsedVideo.thumbnailUrl ||
+      project.thumbnailUrl ||
+      resolvedThumbnail.videoUrl === project.videoUrl
+    )
+      return;
+
+    const controller = new AbortController();
+    const videoUrl = project.videoUrl;
+    const task = window.setTimeout(async () => {
+      setThumbnailResolving(true);
+      try {
+        const response = await adminFetch('/api/admin/thumbnail/resolve', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ videoUrl }),
+          signal: controller.signal,
+        });
+        const data = (await response.json()) as {
+          error?: string;
+          url?: string;
+        };
+        if (!response.ok)
+          throw new Error(data.error || 'Unable to detect thumbnail');
+        const url = data.url || '';
+        setResolvedThumbnail({ videoUrl, url });
+        if (url) {
+          setProject((current) =>
+            current.videoUrl === videoUrl && !current.thumbnailUrl
+              ? { ...current, thumbnailUrl: url }
+              : current,
+          );
+        }
+      } catch {
+        if (!controller.signal.aborted)
+          setResolvedThumbnail({ videoUrl, url: '' });
+      } finally {
+        if (!controller.signal.aborted) setThumbnailResolving(false);
+      }
+    }, 350);
+
+    return () => {
+      window.clearTimeout(task);
+      controller.abort();
+    };
+  }, [
+    parsedVideo,
+    project.thumbnailUrl,
+    project.videoUrl,
+    resolvedThumbnail.videoUrl,
+  ]);
 
   const uploadThumbnail = async (file?: File) => {
     if (!file) return;
@@ -482,7 +549,7 @@ export function AdminClient({
                     }
                   />
                 </Field>
-                <Field label="Title — Vietnamese">
+                <Field label="Tiêu đề — Tiếng Việt">
                   <Input
                     value={project.titleVi}
                     onChange={(event) =>
@@ -501,7 +568,7 @@ export function AdminClient({
                     }
                   />
                 </Field>
-                <Field label="Description — Vietnamese">
+                <Field label="Mô tả — Tiếng Việt">
                   <Textarea
                     value={project.descriptionVi}
                     onChange={(event) =>
@@ -521,7 +588,7 @@ export function AdminClient({
                     placeholder="SaaS Motion, Typography"
                   />
                 </Field>
-                <Field label="Tags — Vietnamese">
+                <Field label="Thẻ — Tiếng Việt">
                   <Input
                     value={project.tagsVi}
                     onChange={(event) =>
@@ -542,7 +609,13 @@ export function AdminClient({
                           : undefined
                       }
                     >
-                      {!project.thumbnailUrl && (
+                      {!project.thumbnailUrl && thumbnailResolving && (
+                        <span>
+                          <Loader2 className="spin" /> Finding original
+                          thumbnail…
+                        </span>
+                      )}
+                      {!project.thumbnailUrl && !thumbnailResolving && (
                         <span>
                           <ImageIcon /> No thumbnail selected
                         </span>
@@ -604,8 +677,8 @@ export function AdminClient({
                       placeholder="https://…/cover.jpg"
                     />
                     <small>
-                      Optional alternative. YouTube covers are detected
-                      automatically.
+                      Optional fallback. Original provider covers are detected
+                      automatically when available.
                     </small>
                     {currentThumbnailUrlError && (
                       <small className="admin-field-error">
