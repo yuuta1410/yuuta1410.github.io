@@ -1,0 +1,31 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "@cloudflare/workers-types", "vite/client"],
+    "incremental": false,
+    "paths": {
+      "@/*": ["./*"],
+      "next/image": ["./src/image.tsx"]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "worker/**/*.ts",
+    "components/admin-client.tsx",
+    "components/portfolio-client.tsx",
+    "components/social-glyph.tsx",
+    "components/ui/button.tsx",
+    "components/ui/dialog.tsx",
+    "components/ui/input.tsx",
+    "components/ui/select.tsx",
+    "components/ui/switch.tsx",
+    "components/ui/textarea.tsx",
+    "components/ui/tooltip.tsx",
+    "lib/socials.ts",
+    "lib/types.ts",
+    "lib/utils.ts",
+    "lib/video.ts",
+    "vite.config.ts"
+  ]
+}

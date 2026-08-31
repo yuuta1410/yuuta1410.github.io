@@ -39,6 +39,7 @@ import {
   socialPlatformSuggestions,
 } from '@/lib/socials';
 import { parseVideoUrl, platformName } from '@/lib/video';
+import { adminFetch, normalizeContent } from '@/src/api';
 
 type AdminSection = 'projects' | 'profile' | 'socials';
 
@@ -118,9 +119,9 @@ export function AdminClient({
 
   const load = async () => {
     try {
-      const response = await fetch('/api/admin/content', { cache: 'no-store' });
+      const response = await adminFetch('/api/admin/content');
       if (!response.ok) throw new Error('Unable to load settings');
-      const data = (await response.json()) as PortfolioContent;
+      const data = normalizeContent((await response.json()) as PortfolioContent);
       setContent(data);
       setSettings(data.settings);
       setSocials(data.socials);
@@ -144,7 +145,7 @@ export function AdminClient({
     setError('');
     setMessage('');
     try {
-      const response = await fetch('/api/admin/content', {
+      const response = await adminFetch('/api/admin/content', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(payload),
@@ -155,11 +156,12 @@ export function AdminClient({
       };
       if (!response.ok || !data.content)
         throw new Error(data.error || 'Unable to save changes');
-      setContent(data.content);
-      setSettings(data.content.settings);
-      setSocials(data.content.socials);
+      const normalized = normalizeContent(data.content);
+      setContent(normalized);
+      setSettings(normalized.settings);
+      setSocials(normalized.socials);
       setMessage(success);
-      return data.content;
+      return normalized;
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : 'Unable to save changes',
@@ -223,7 +225,7 @@ export function AdminClient({
     try {
       const formData = new FormData();
       formData.set('file', file);
-      const response = await fetch('/api/admin/thumbnail', {
+      const response = await adminFetch('/api/admin/thumbnail', {
         method: 'POST',
         body: formData,
       });
