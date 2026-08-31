@@ -296,26 +296,34 @@ function mapSocial(row: SocialRow): SocialLink {
 export async function getPortfolioContent(
   includeUnpublished = false,
 ): Promise<PortfolioContent> {
-  await ensureDatabase();
-  const db = await database();
-  const [settingsResult, projectResult, socialResult] = await Promise.all([
-    db.prepare('SELECT * FROM site_settings WHERE id = 1').all<SettingsRow>(),
-    db
-      .prepare(
-        `SELECT * FROM projects ${includeUnpublished ? '' : 'WHERE published = 1'} ORDER BY sort_order ASC, created_at DESC`,
-      )
-      .all<ProjectRow>(),
-    db
-      .prepare(
-        `SELECT * FROM social_links ${includeUnpublished ? '' : "WHERE enabled = 1 AND url != ''"} ORDER BY sort_order ASC`,
-      )
-      .all<SocialRow>(),
-  ]);
-  return {
-    settings: mapSettings(settingsResult.results[0]),
-    projects: projectResult.results.map(mapProject),
-    socials: socialResult.results.map(mapSocial),
+  const readContent = async (): Promise<PortfolioContent> => {
+    const db = await database();
+    const [settingsResult, projectResult, socialResult] = await Promise.all([
+      db.prepare('SELECT * FROM site_settings WHERE id = 1').all<SettingsRow>(),
+      db
+        .prepare(
+          `SELECT * FROM projects ${includeUnpublished ? '' : 'WHERE published = 1'} ORDER BY sort_order ASC, created_at DESC`,
+        )
+        .all<ProjectRow>(),
+      db
+        .prepare(
+          `SELECT * FROM social_links ${includeUnpublished ? '' : "WHERE enabled = 1 AND url != ''"} ORDER BY sort_order ASC`,
+        )
+        .all<SocialRow>(),
+    ]);
+    return {
+      settings: mapSettings(settingsResult.results[0]),
+      projects: projectResult.results.map(mapProject),
+      socials: socialResult.results.map(mapSocial),
+    };
   };
+
+  try {
+    return await readContent();
+  } catch {
+    await ensureDatabase();
+    return readContent();
+  }
 }
 
 export async function saveSettings(settings: SiteSettings) {

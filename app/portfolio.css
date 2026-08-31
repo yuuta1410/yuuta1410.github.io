@@ -26,7 +26,7 @@ body {
   min-height: 100vh;
   overflow: visible;
   color: var(--yuuta-ink);
-  font-family: 'Baloo 2', var(--font-geist-sans), sans-serif;
+  font-family: var(--font-baloo-2), var(--font-geist-sans), sans-serif;
   font-weight: 600;
 }
 
@@ -171,7 +171,7 @@ body {
   box-shadow: 0 4px 0 rgba(22, 78, 155, 0.2);
   cursor: pointer;
   font:
-    800 0.92rem 'Baloo 2',
+    800 0.92rem var(--font-baloo-2),
     sans-serif;
   transition:
     transform 0.15s ease,
@@ -281,7 +281,7 @@ body {
   background: var(--yuuta-100);
   color: var(--yuuta-900);
   font:
-    800 0.86rem 'Baloo 2',
+    800 0.86rem var(--font-baloo-2),
     sans-serif;
   letter-spacing: 0.06em;
   cursor: pointer;
@@ -817,7 +817,7 @@ body {
 .video-dialog-header [data-slot='dialog-title'] {
   overflow: hidden;
   color: var(--yuuta-ink);
-  font-family: 'Baloo 2', sans-serif;
+  font-family: var(--font-baloo-2), sans-serif;
   font-size: 0.98rem;
   font-weight: 700;
   line-height: 1.25;

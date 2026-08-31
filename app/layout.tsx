@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Baloo_2, Geist, Geist_Mono } from 'next/font/google';
 import { headers } from 'next/headers';
 import { cookies } from 'next/headers';
 import './globals.css';
@@ -9,6 +9,11 @@ const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
+});
+const baloo = Baloo_2({
+  variable: '--font-baloo-2',
+  subsets: ['latin', 'vietnamese'],
+  display: 'swap',
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -73,7 +78,9 @@ export default async function RootLayout({
     cookieStore.get('yuuta-language')?.value === 'vi' ? 'vi' : 'en';
   return (
     <html lang={language}>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${baloo.variable}`}
+      >
         {children}
       </body>
     </html>

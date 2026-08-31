@@ -225,10 +225,11 @@ function ProjectCard({
       >
         {!project.thumbnailUrl && (
           <Image
-            src="/yuuta-logo-sapphire-v5.png"
+            src="/yuuta-logo-sapphire-v5.webp"
             alt=""
             width={1399}
             height={1124}
+            unoptimized
           />
         )}
         <span className="platform-corner">
@@ -404,10 +405,11 @@ function YuutaBot({
       >
         <div className="chat-head">
           <Image
-            src="/yuuta-flame-sapphire-v3.png"
+            src="/yuuta-flame-sapphire-v3.webp"
             alt=""
             width={1254}
             height={1254}
+            unoptimized
           />
           <b>{t.botName}</b>
           <span>{t.online}</span>
@@ -442,10 +444,11 @@ function YuutaBot({
         aria-expanded={open}
       >
         <Image
-          src="/yuuta-flame-sapphire-v3.png"
+          src="/yuuta-flame-sapphire-v3.webp"
           alt=""
           width={1254}
           height={1254}
+          unoptimized
         />
         <span />
       </button>
@@ -613,11 +616,12 @@ export function PortfolioClient({
         <div className="header-inner">
           <a className="header-brand" href="#top" aria-label={t.homeLabel}>
             <Image
-              src="/yuuta-logo-sapphire-v5.png"
+              src="/yuuta-logo-sapphire-v5.webp"
               alt="Yuuta"
               width={1399}
               height={1124}
               priority
+              unoptimized
             />
           </a>
           <nav aria-label={t.navLabel}>
@@ -658,11 +662,12 @@ export function PortfolioClient({
       <section className="hero" id="top">
         <Image
           className="hero-logo"
-          src="/yuuta-logo-sapphire-v5.png"
+          src="/yuuta-logo-sapphire-v5.webp"
           alt="Yuuta logo"
           width={1399}
           height={1124}
           priority
+          unoptimized
         />
         <p className="hero-hello">
           {t.hello} — {role} ✦
@@ -724,10 +729,11 @@ export function PortfolioClient({
         ) : (
           <div className="cute-empty reveal-item">
             <Image
-              src="/yuuta-logo-sapphire-v5.png"
+              src="/yuuta-logo-sapphire-v5.webp"
               alt=""
               width={1399}
               height={1124}
+              unoptimized
             />
             <h3>{t.empty}</h3>
             <p>{t.emptyNote}</p>
@@ -771,10 +777,11 @@ export function PortfolioClient({
           aria-label={t.backToTop}
         >
           <Image
-            src="/yuuta-flame-sapphire-v3.png"
+            src="/yuuta-flame-sapphire-v3.webp"
             alt=""
             width={1254}
             height={1254}
+            unoptimized
           />
         </button>
       </footer>
