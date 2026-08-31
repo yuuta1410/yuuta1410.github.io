@@ -858,7 +858,7 @@ body {
   background: #103a77;
 }
 .player-shell.vertical {
-  width: min(430px, 100%);
+  width: min(430px, 100%, calc(56.25vh - 106.875px));
   max-height: calc(100vh - 190px);
   margin: 0 auto;
   aspect-ratio: 9 / 16;

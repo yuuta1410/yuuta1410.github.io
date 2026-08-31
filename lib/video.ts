@@ -49,8 +49,11 @@ export function parseVideoUrl(input: string): ParsedVideo | null {
   }
 
   if (host === 'instagram.com' || host.endsWith('.instagram.com')) {
-    const kind = ['reel', 'p', 'tv'].includes(parts[0]) ? parts[0] : '';
-    const id = kind ? parts[1] : '';
+    const kindIndex = parts.findIndex((part) =>
+      ['reel', 'p', 'tv'].includes(part),
+    );
+    const kind = kindIndex >= 0 ? parts[kindIndex] : '';
+    const id = kind ? parts[kindIndex + 1] : '';
     if (!id || !/^[\w-]+$/.test(id)) return null;
     return {
       platform: 'instagram', id,
