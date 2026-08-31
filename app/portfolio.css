@@ -1266,7 +1266,7 @@ body {
     display: grid;
     width: 100%;
     max-width: 330px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
   }
   .hero-badge {
@@ -1274,7 +1274,11 @@ body {
     padding: 6px 4px;
     font-size: 0.72rem;
     letter-spacing: 0.02em;
-    white-space: nowrap;
+  }
+  .hero-badge:first-child {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: 50%;
   }
 }
 

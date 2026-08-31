@@ -1,5 +1,9 @@
 export type Language = 'en' | 'vi';
-export type Category = 'MOTION' | 'MV EDIT' | 'AI VIDEO';
+export type Category =
+  | 'Motion Graphics'
+  | 'AMV / MMV'
+  | 'Music Video'
+  | 'Other';
 export type VideoPlatform = 'youtube' | 'vimeo' | 'tiktok' | 'instagram';
 
 export type SiteSettings = {

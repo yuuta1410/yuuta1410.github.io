@@ -10,7 +10,12 @@ import type { Category, Project, SiteSettings, SocialLink } from '@/lib/types';
 import { parseVideoUrl } from '@/lib/video';
 import { normalizeSocialPlatform, socialLinkError } from '@/lib/socials';
 
-const categories: Category[] = ['MOTION', 'MV EDIT', 'AI VIDEO'];
+const categories: Category[] = [
+  'Motion Graphics',
+  'AMV / MMV',
+  'Music Video',
+  'Other',
+];
 
 function text(value: unknown, max = 2000): string {
   return typeof value === 'string' ? value.trim().slice(0, max) : '';

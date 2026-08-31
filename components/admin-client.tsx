@@ -50,7 +50,7 @@ const blankProject = (sortOrder = 0): Project => ({
   descriptionVi: '',
   tagsEn: '',
   tagsVi: '',
-  category: 'MOTION',
+  category: 'Motion Graphics',
   videoUrl: '',
   platform: 'youtube',
   thumbnailUrl: '',
@@ -459,13 +459,16 @@ export function AdminClient({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {(['MOTION', 'MV EDIT', 'AI VIDEO'] as Category[]).map(
-                        (item) => (
-                          <SelectItem value={item} key={item}>
-                            {item}
-                          </SelectItem>
-                        ),
-                      )}
+                      {([
+                        'Motion Graphics',
+                        'AMV / MMV',
+                        'Music Video',
+                        'Other',
+                      ] as Category[]).map((item) => (
+                        <SelectItem value={item} key={item}>
+                          {item}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </Field>
@@ -793,8 +796,8 @@ export function AdminClient({
               <div>
                 <h2>Social links</h2>
                 <p>
-                  Only enabled links with a valid URL appear above the MOTION,
-                  MV EDIT and AI VIDEO tabs.
+                  Only enabled links with a valid URL appear above the project
+                  category tabs.
                 </p>
               </div>
               <Button size="sm" onClick={addSocial}>

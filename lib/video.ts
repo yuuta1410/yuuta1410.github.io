@@ -20,7 +20,7 @@ export function parseVideoUrl(input: string): ParsedVideo | null {
     if (!id || !/^[\w-]{6,}$/.test(id)) return null;
     return {
       platform: 'youtube', id,
-      embedUrl: `https://www.youtube-nocookie.com/embed/${id}?rel=0&playsinline=1`,
+      embedUrl: `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1`,
       thumbnailUrl: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
       vertical: parts[0] === 'shorts',
     };
@@ -43,7 +43,7 @@ export function parseVideoUrl(input: string): ParsedVideo | null {
     if (!id || !/^\d+$/.test(id)) return null;
     return {
       platform: 'tiktok', id,
-      embedUrl: `https://www.tiktok.com/player/v1/${id}?loop=0&rel=0&music_info=0&description=0`,
+      embedUrl: `https://www.tiktok.com/player/v1/${id}?autoplay=1&loop=0&rel=0&music_info=0&description=0`,
       thumbnailUrl: '', vertical: true,
     };
   }

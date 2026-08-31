@@ -263,6 +263,20 @@ function mapSettings(row?: SettingsRow): SiteSettings {
 }
 
 function mapProject(row: ProjectRow): Project {
+  const storedCategory = String(row.category);
+  const category: Project['category'] =
+    storedCategory === 'MOTION'
+      ? 'Motion Graphics'
+      : storedCategory === 'MV EDIT'
+        ? 'AMV / MMV'
+        : storedCategory === 'AI VIDEO'
+          ? 'Other'
+          : storedCategory === 'Motion Graphics' ||
+              storedCategory === 'AMV / MMV' ||
+              storedCategory === 'Music Video' ||
+              storedCategory === 'Other'
+            ? storedCategory
+            : 'Other';
   return {
     id: String(row.id),
     titleEn: String(row.title_en),
@@ -271,7 +285,7 @@ function mapProject(row: ProjectRow): Project {
     descriptionVi: String(row.description_vi),
     tagsEn: String(row.tags_en),
     tagsVi: String(row.tags_vi),
-    category: String(row.category) as Project['category'],
+    category,
     videoUrl: String(row.video_url),
     platform: String(row.platform) as Project['platform'],
     thumbnailUrl: String(row.thumbnail_url),

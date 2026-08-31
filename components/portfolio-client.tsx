@@ -27,7 +27,15 @@ import type {
 import { SocialGlyph } from '@/components/social-glyph';
 import { parseVideoUrl, platformName } from '@/lib/video';
 
-const categories: Category[] = ['MOTION', 'MV EDIT', 'AI VIDEO'];
+type CategoryFilter = 'All' | Category;
+
+const categories: CategoryFilter[] = [
+  'All',
+  'Motion Graphics',
+  'AMV / MMV',
+  'Music Video',
+  'Other',
+];
 
 const ui = {
   en: {
@@ -295,7 +303,7 @@ function VideoDialog({
             )}
           </div>
         </DialogHeader>
-        {project && parsed ? (
+        {open && project && parsed ? (
           <div className={`player-shell ${parsed.vertical ? 'vertical' : ''}`}>
             <iframe
               key={parsed.embedUrl}
@@ -305,7 +313,7 @@ function VideoDialog({
               allowFullScreen
             />
           </div>
-        ) : project ? (
+        ) : open && project ? (
           <div className="player-fallback">
             <p>{ui[language].unavailable}</p>
           </div>
@@ -464,7 +472,7 @@ export function PortfolioClient({
   initialLanguage: Language;
 }) {
   const [language, setLanguage] = useState<Language>(initialLanguage);
-  const [category, setCategory] = useState<Category>('MOTION');
+  const [category, setCategory] = useState<CategoryFilter>('All');
   const [visible, setVisible] = useState(6);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [videoOpen, setVideoOpen] = useState(false);
@@ -475,7 +483,10 @@ export function PortfolioClient({
   const { settings, projects, socials } = initialContent;
 
   const filtered = useMemo(
-    () => projects.filter((project) => project.category === category),
+    () =>
+      category === 'All'
+        ? projects
+        : projects.filter((project) => project.category === category),
     [projects, category],
   );
   const shown = filtered.slice(0, visible);
@@ -565,7 +576,7 @@ export function PortfolioClient({
     document.cookie = `yuuta-language=${nextLanguage}; Path=/; Max-Age=31536000; SameSite=Lax`;
   };
 
-  const changeCategory = (next: Category, scroll = false) => {
+  const changeCategory = (next: CategoryFilter, scroll = false) => {
     setCategory(next);
     setVisible(6);
     if (scroll)
