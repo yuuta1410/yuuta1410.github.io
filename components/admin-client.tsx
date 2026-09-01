@@ -261,7 +261,7 @@ export function AdminClient({
         if (!controller.signal.aborted)
           setResolvedThumbnail({ videoUrl, url: '' });
       } finally {
-        if (!controller.signal.aborted) setThumbnailResolving(false);
+        setThumbnailResolving(false);
       }
     }, 350);
 
