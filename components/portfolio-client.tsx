@@ -55,7 +55,7 @@ const ui = {
     share: 'Share',
     shared: 'Website link copied!',
     hello: 'Hi! I’m Yuuta',
-    showMore: 'Show more',
+    showMore: 'Show More',
     showLess: 'Show less',
     play: 'Play video',
     empty: 'New work is being prepared!',

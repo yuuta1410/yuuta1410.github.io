@@ -123,6 +123,7 @@ export function AdminClient({
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
+    setError('');
     try {
       const response = await adminFetch('/api/admin/content');
       if (!response.ok) throw new Error('Unable to load settings');
@@ -375,8 +376,9 @@ export function AdminClient({
   if (!content || !settings) {
     return (
       <main className="admin-loading">
-        <Loader2 className="spin" />
+        {!error && <Loader2 className="spin" />}
         <p>{error || 'Loading Yuuta settings…'}</p>
+        {error && <Button onClick={() => void load()}>Retry</Button>}
       </main>
     );
   }
@@ -728,6 +730,7 @@ export function AdminClient({
                   disabled={
                     saving ||
                     thumbnailUploading ||
+                    thumbnailResolving ||
                     Boolean(currentThumbnailUrlError) ||
                     !parsedVideo ||
                     !project.titleEn ||

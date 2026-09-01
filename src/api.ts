@@ -41,5 +41,14 @@ export async function adminFetch(
   const headers = new Headers(init.headers);
   const token = getAdminToken();
   if (token) headers.set('authorization', `Bearer ${token}`);
-  return fetch(apiUrl(path), { ...init, headers, cache: 'no-store' });
+  const response = await fetch(apiUrl(path), {
+    ...init,
+    headers,
+    cache: 'no-store',
+  });
+  if (response.status === 401 && token) {
+    setAdminToken('');
+    window.location.replace('/admin/');
+  }
+  return response;
 }
