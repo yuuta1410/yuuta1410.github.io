@@ -191,6 +191,12 @@ export function AdminClient({
     project.thumbnailUrl && project.thumbnailUrl !== automaticThumbnail,
   );
   const currentThumbnailUrlError = thumbnailUrlError(project.thumbnailUrl);
+  const automaticThumbnailPending = Boolean(
+    parsedVideo &&
+      !parsedVideo.thumbnailUrl &&
+      !project.thumbnailUrl &&
+      resolvedThumbnail.videoUrl !== project.videoUrl,
+  );
 
   const updateProjectUrl = (videoUrl: string) => {
     const parsed = parseVideoUrl(videoUrl);
@@ -731,6 +737,7 @@ export function AdminClient({
                     saving ||
                     thumbnailUploading ||
                     thumbnailResolving ||
+                    automaticThumbnailPending ||
                     Boolean(currentThumbnailUrlError) ||
                     !parsedVideo ||
                     !project.titleEn ||
