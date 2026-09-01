@@ -1269,13 +1269,14 @@ body {
   }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 430px) {
   .hero-badges {
     display: grid;
     width: 100%;
     max-width: 330px;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
+    margin-inline: auto;
   }
   .hero-badge {
     min-width: 0;

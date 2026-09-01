@@ -740,7 +740,7 @@ export function PortfolioClient({
         <p className="hero-hello">
           {t.hello} — {role} ✦
         </p>
-        <p className="hero-tagline">{headline}✦</p>
+        <p className="hero-tagline">{headline} ✦</p>
         <SocialDock socials={socials} ariaLabel={t.socialLabel} />
         <div
           className="hero-badges"
