@@ -1193,6 +1193,12 @@ body {
   }
 }
 
+@media (max-width: 820px) {
+  .contact-card-centered {
+    width: 100%;
+  }
+}
+
 @media (max-width: 560px) {
   .yuuta-site .site-header nav > a {
     display: none;
