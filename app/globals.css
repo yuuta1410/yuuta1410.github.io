@@ -4,7 +4,7 @@
 
 @font-face {
   font-family: 'Baloo 2';
-  src: url('/fonts/baloo-2-400.woff2') format('woff2');
+  src: url('/fonts/baloo-2-400.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -12,7 +12,7 @@
 
 @font-face {
   font-family: 'Baloo 2';
-  src: url('/fonts/baloo-2-500.woff2') format('woff2');
+  src: url('/fonts/baloo-2-500.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 500;
   font-display: swap;
@@ -20,7 +20,7 @@
 
 @font-face {
   font-family: 'Baloo 2';
-  src: url('/fonts/baloo-2-600.woff2') format('woff2');
+  src: url('/fonts/baloo-2-600.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 600;
   font-display: swap;
@@ -28,7 +28,7 @@
 
 @font-face {
   font-family: 'Baloo 2';
-  src: url('/fonts/baloo-2-700.woff2') format('woff2');
+  src: url('/fonts/baloo-2-700.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 700;
   font-display: swap;
@@ -36,7 +36,7 @@
 
 @font-face {
   font-family: 'Baloo 2';
-  src: url('/fonts/baloo-2-800.woff2') format('woff2');
+  src: url('/fonts/baloo-2-800.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 800 900;
   font-display: swap;
@@ -44,7 +44,7 @@
 
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/geist-400.woff2') format('woff2');
+  src: url('/fonts/geist-400.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -52,7 +52,7 @@
 
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/geist-500.woff2') format('woff2');
+  src: url('/fonts/geist-500.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 500;
   font-display: swap;
@@ -60,7 +60,7 @@
 
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/geist-600.woff2') format('woff2');
+  src: url('/fonts/geist-600.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 600;
   font-display: swap;
@@ -68,7 +68,7 @@
 
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/geist-650.woff2') format('woff2');
+  src: url('/fonts/geist-650.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 650;
   font-display: swap;
@@ -76,7 +76,7 @@
 
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/geist-700.woff2') format('woff2');
+  src: url('/fonts/geist-700.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 700;
   font-display: swap;
@@ -84,7 +84,7 @@
 
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/geist-750.woff2') format('woff2');
+  src: url('/fonts/geist-750.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 750;
   font-display: swap;
@@ -92,7 +92,7 @@
 
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/geist-800.woff2') format('woff2');
+  src: url('/fonts/geist-800.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 800;
   font-display: swap;
@@ -100,7 +100,7 @@
 
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/geist-900.woff2') format('woff2');
+  src: url('/fonts/geist-900.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 900;
   font-display: swap;
@@ -108,7 +108,7 @@
 
 @font-face {
   font-family: 'Geist Mono';
-  src: url('/fonts/geist-mono-400.woff2') format('woff2');
+  src: url('/fonts/geist-mono-400.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -116,7 +116,7 @@
 
 @font-face {
   font-family: 'Geist Mono';
-  src: url('/fonts/geist-mono-500.woff2') format('woff2');
+  src: url('/fonts/geist-mono-500.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 500;
   font-display: swap;
@@ -124,7 +124,7 @@
 
 @font-face {
   font-family: 'Geist Mono';
-  src: url('/fonts/geist-mono-600.woff2') format('woff2');
+  src: url('/fonts/geist-mono-600.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 600;
   font-display: swap;
@@ -132,7 +132,7 @@
 
 @font-face {
   font-family: 'Geist Mono';
-  src: url('/fonts/geist-mono-650.woff2') format('woff2');
+  src: url('/fonts/geist-mono-650.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 650;
   font-display: swap;
@@ -140,7 +140,7 @@
 
 @font-face {
   font-family: 'Geist Mono';
-  src: url('/fonts/geist-mono-700.woff2') format('woff2');
+  src: url('/fonts/geist-mono-700.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 700;
   font-display: swap;
@@ -148,7 +148,7 @@
 
 @font-face {
   font-family: 'Geist Mono';
-  src: url('/fonts/geist-mono-750.woff2') format('woff2');
+  src: url('/fonts/geist-mono-750.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 750;
   font-display: swap;
@@ -156,7 +156,7 @@
 
 @font-face {
   font-family: 'Geist Mono';
-  src: url('/fonts/geist-mono-800.woff2') format('woff2');
+  src: url('/fonts/geist-mono-800.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 800;
   font-display: swap;
@@ -164,7 +164,7 @@
 
 @font-face {
   font-family: 'Geist Mono';
-  src: url('/fonts/geist-mono-900.woff2') format('woff2');
+  src: url('/fonts/geist-mono-900.woff2?v=2') format('woff2');
   font-style: normal;
   font-weight: 900;
   font-display: swap;
