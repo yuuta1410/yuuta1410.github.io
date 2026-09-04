@@ -215,8 +215,8 @@ body {
   position: relative;
   z-index: 1;
   display: block;
-  min-height: 589px;
-  padding: 72px 20px 56px;
+  min-height: 0;
+  padding: 56px 20px 28px;
   overflow: visible;
   background: none;
   text-align: center;
@@ -249,7 +249,7 @@ body {
 .hero-hello {
   display: inline-block;
   max-width: min(760px, 92vw);
-  margin: 26px 0 0;
+  margin: 0;
   padding: 9px 24px;
   border: 3px solid var(--yuuta-300);
   border-radius: 999px;
@@ -1214,8 +1214,8 @@ body {
     padding-inline: 13px;
   }
   .yuuta-site .hero {
-    min-height: 579px;
-    padding: 48px 16px 46px;
+    min-height: 0;
+    padding: 36px 16px 24px;
   }
   .hero-logo {
     width: min(330px, 88vw);
