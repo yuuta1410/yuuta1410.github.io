@@ -728,15 +728,6 @@ export function PortfolioClient({
       </header>
 
       <section className="hero" id="top">
-        <Image
-          className="hero-logo"
-          src="/yuuta-logo-sapphire-v5.webp"
-          alt="Yuuta logo"
-          width={1399}
-          height={1124}
-          priority
-          unoptimized
-        />
         <p className="hero-hello">
           {t.hello} — {role} ✦
         </p>
