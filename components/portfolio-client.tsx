@@ -25,6 +25,7 @@ import type {
   SocialLink,
 } from '@/lib/types';
 import { SocialGlyph } from '@/components/social-glyph';
+import { YouTubePreview } from '@/components/youtube-preview';
 import { parseVideoUrl, platformName } from '@/lib/video';
 
 type CategoryFilter = 'All' | Category;
@@ -344,32 +345,41 @@ function VideoDialog({
           </div>
         </DialogHeader>
         {open && project && parsed ? (
-          <div className={`player-shell ${parsed.vertical ? 'vertical' : ''}`}>
-            <iframe
-              ref={playerRef}
-              key={parsed.embedUrl}
-              src={parsed.embedUrl}
+          parsed.platform === 'youtube' ? (
+            <YouTubePreview
+              key={parsed.id}
+              embedUrl={parsed.embedUrl}
+              language={language}
               title={title}
-              allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-              allowFullScreen
-              onLoad={() => {
-                if (parsed.platform !== 'tiktok') return;
-                const player = playerRef.current?.contentWindow;
-                player?.postMessage(
-                  {
-                    type: 'unMute',
-                    value: undefined,
-                    'x-tiktok-player': true,
-                  },
-                  'https://www.tiktok.com',
-                );
-                player?.postMessage(
-                  { type: 'play', value: undefined, 'x-tiktok-player': true },
-                  'https://www.tiktok.com',
-                );
-              }}
             />
-          </div>
+          ) : (
+            <div className={`player-shell ${parsed.vertical ? 'vertical' : ''}`}>
+              <iframe
+                ref={playerRef}
+                key={parsed.embedUrl}
+                src={parsed.embedUrl}
+                title={title}
+                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                allowFullScreen
+                onLoad={() => {
+                  if (parsed.platform !== 'tiktok') return;
+                  const player = playerRef.current?.contentWindow;
+                  player?.postMessage(
+                    {
+                      type: 'unMute',
+                      value: undefined,
+                      'x-tiktok-player': true,
+                    },
+                    'https://www.tiktok.com',
+                  );
+                  player?.postMessage(
+                    { type: 'play', value: undefined, 'x-tiktok-player': true },
+                    'https://www.tiktok.com',
+                  );
+                }}
+              />
+            </div>
+          )
         ) : open && project ? (
           <div className="player-fallback">
             <p>{ui[language].unavailable}</p>
