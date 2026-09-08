@@ -262,53 +262,6 @@ function ProjectCard({
   );
 }
 
-function YouTubeEmbed({
-  src,
-  title,
-  thumbnailUrl,
-}: {
-  src: string;
-  title: string;
-  thumbnailUrl: string;
-}) {
-  const [showStartupCover, setShowStartupCover] = useState(true);
-  const revealTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(
-    () => () => {
-      if (revealTimer.current) clearTimeout(revealTimer.current);
-    },
-    [],
-  );
-
-  return (
-    <>
-      <iframe
-        src={src}
-        title={title}
-        tabIndex={-1}
-        style={{ pointerEvents: 'none' }}
-        allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-        allowFullScreen
-        onLoad={() => {
-          if (revealTimer.current) clearTimeout(revealTimer.current);
-          revealTimer.current = setTimeout(
-            () => setShowStartupCover(false),
-            4000,
-          );
-        }}
-      />
-      {showStartupCover && (
-        <span
-          aria-hidden="true"
-          className="youtube-startup-cover"
-          style={{ backgroundImage: `url(${thumbnailUrl})` }}
-        />
-      )}
-    </>
-  );
-}
-
 function VideoDialog({
   project,
   open,
@@ -392,38 +345,36 @@ function VideoDialog({
         </DialogHeader>
         {open && project && parsed ? (
           <div className={`player-shell ${parsed.vertical ? 'vertical' : ''}`}>
-            {parsed.platform === 'youtube' ? (
-              <YouTubeEmbed
-                src={parsed.embedUrl}
-                title={title}
-                thumbnailUrl={project.thumbnailUrl || parsed.thumbnailUrl}
-              />
-            ) : (
-              <iframe
-                ref={playerRef}
-                key={parsed.embedUrl}
-                src={parsed.embedUrl}
-                title={title}
-                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-                allowFullScreen
-                onLoad={() => {
-                  if (parsed.platform !== 'tiktok') return;
-                  const player = playerRef.current?.contentWindow;
-                  player?.postMessage(
-                    {
-                      type: 'unMute',
-                      value: undefined,
-                      'x-tiktok-player': true,
-                    },
-                    'https://www.tiktok.com',
-                  );
-                  player?.postMessage(
-                    { type: 'play', value: undefined, 'x-tiktok-player': true },
-                    'https://www.tiktok.com',
-                  );
-                }}
-              />
-            )}
+            <iframe
+              ref={playerRef}
+              key={parsed.embedUrl}
+              src={parsed.embedUrl}
+              title={title}
+              tabIndex={parsed.platform === 'youtube' ? -1 : undefined}
+              style={
+                parsed.platform === 'youtube'
+                  ? { pointerEvents: 'none' }
+                  : undefined
+              }
+              allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+              allowFullScreen
+              onLoad={() => {
+                if (parsed.platform !== 'tiktok') return;
+                const player = playerRef.current?.contentWindow;
+                player?.postMessage(
+                  {
+                    type: 'unMute',
+                    value: undefined,
+                    'x-tiktok-player': true,
+                  },
+                  'https://www.tiktok.com',
+                );
+                player?.postMessage(
+                  { type: 'play', value: undefined, 'x-tiktok-player': true },
+                  'https://www.tiktok.com',
+                );
+              }}
+            />
           </div>
         ) : open && project ? (
           <div className="player-fallback">
