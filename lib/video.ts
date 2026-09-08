@@ -20,7 +20,7 @@ export function parseVideoUrl(input: string): ParsedVideo | null {
     if (!id || !/^[\w-]{6,}$/.test(id)) return null;
     return {
       platform: 'youtube', id,
-      embedUrl: `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1&controls=0`,
+      embedUrl: `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1&controls=0&loop=1&playlist=${id}`,
       thumbnailUrl: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
       vertical: parts[0] === 'shorts',
     };

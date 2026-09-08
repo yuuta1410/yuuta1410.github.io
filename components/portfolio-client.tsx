@@ -350,6 +350,12 @@ function VideoDialog({
               key={parsed.embedUrl}
               src={parsed.embedUrl}
               title={title}
+              tabIndex={parsed.platform === 'youtube' ? -1 : undefined}
+              style={
+                parsed.platform === 'youtube'
+                  ? { pointerEvents: 'none' }
+                  : undefined
+              }
               allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
               allowFullScreen
               onLoad={() => {
