@@ -281,7 +281,7 @@ body {
   background: var(--yuuta-100);
   color: var(--yuuta-900);
   font:
-    800 0.86rem var(--font-baloo-2),
+    700 0.86rem var(--font-baloo-2),
     sans-serif;
   letter-spacing: 0.06em;
   cursor: pointer;
