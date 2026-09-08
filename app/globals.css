@@ -1106,6 +1106,16 @@ footer > a:last-child:hover {
   height: 100%;
   border: 0;
 }
+.youtube-startup-cover {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background-color: #020b16;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  pointer-events: none;
+}
 .video-description {
   max-width: 760px;
   margin: 2px 4px 0;
