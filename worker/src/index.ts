@@ -284,6 +284,31 @@ async function upsertProject(env: Env, project: Project): Promise<void> {
     ).run();
 }
 
+async function reorderProjects(env: Env, value: unknown): Promise<void> {
+  if (!Array.isArray(value)) throw new Error('Invalid project order');
+  const ids = value.map((item) => text(item, 100));
+  if (ids.some((id) => !id) || new Set(ids).size !== ids.length)
+    throw new Error('Invalid project order');
+
+  const existing = await env.DB.prepare('SELECT id FROM projects').all<Row>();
+  const existingIds = new Set(existing.results.map((row) => String(row.id)));
+  if (
+    ids.length !== existingIds.size ||
+    ids.some((id) => !existingIds.has(id))
+  )
+    throw new Error('Project list changed. Reload and try again.');
+
+  if (ids.length === 0) return;
+  await env.DB.batch(
+    ids.map((id, index) =>
+      env.DB.prepare('UPDATE projects SET sort_order = ? WHERE id = ?').bind(
+        index + 1,
+        id,
+      ),
+    ),
+  );
+}
+
 async function saveSocials(env: Env, socials: SocialLink[]): Promise<void> {
   const upserts = socials.map((social) => env.DB.prepare(`INSERT INTO social_links
     (id, platform, label, url, enabled, sort_order) VALUES (?, ?, ?, ?, ?, ?)
@@ -607,6 +632,7 @@ async function adminContent(request: Request, env: Env): Promise<Response> {
     const action = text(body.action, 50);
     if (action === 'save-settings') await saveSettings(env, settingsFrom(body.settings));
     else if (action === 'save-project') await upsertProject(env, projectFrom(body.project));
+    else if (action === 'reorder-projects') await reorderProjects(env, body.ids);
     else if (action === 'delete-project') {
       const id = text(body.id, 100);
       if (!id) throw new Error('Project id is required');

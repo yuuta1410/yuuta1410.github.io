@@ -7,6 +7,7 @@ import {
   ArrowDown,
   ArrowLeft,
   ArrowUp,
+  GripVertical,
   ImageIcon,
   Loader2,
   Plus,
@@ -42,6 +43,10 @@ import { parseVideoUrl, platformName } from '@/lib/video';
 import { adminFetch, normalizeContent } from '@/src/api';
 
 type AdminSection = 'projects' | 'profile' | 'socials';
+type ProjectDropTarget = {
+  id: string;
+  edge: 'before' | 'after';
+};
 
 const blankProject = (sortOrder = 0): Project => ({
   id: '',
@@ -114,6 +119,9 @@ export function AdminClient({
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [deleteTarget, setDeleteTarget] = useState('');
+  const [draggedProjectId, setDraggedProjectId] = useState('');
+  const [projectDropTarget, setProjectDropTarget] =
+    useState<ProjectDropTarget | null>(null);
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [thumbnailResolving, setThumbnailResolving] = useState(false);
   const [resolvedThumbnail, setResolvedThumbnail] = useState({
@@ -341,6 +349,78 @@ export function AdminClient({
     }
   };
 
+  const applyProjectOrder = (projects: Project[]) => {
+    setContent((current) => (current ? { ...current, projects } : current));
+    setProject((current) => {
+      const ordered = projects.find((item) => item.id === current.id);
+      return ordered ? { ...current, sortOrder: ordered.sortOrder } : current;
+    });
+  };
+
+  const saveProjectOrder = async (
+    projects: Project[],
+    previousProjects: Project[],
+  ) => {
+    setSaving(true);
+    setError('');
+    setMessage('');
+    try {
+      const response = await adminFetch('/api/admin/content', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          action: 'reorder-projects',
+          ids: projects.map((item) => item.id),
+        }),
+      });
+      const data = (await response.json()) as {
+        error?: string;
+        content?: PortfolioContent;
+      };
+      if (!response.ok || !data.content)
+        throw new Error(data.error || 'Unable to save project order');
+      const normalized = normalizeContent(data.content);
+      applyProjectOrder(normalized.projects);
+      setMessage('Project order saved.');
+    } catch (cause) {
+      applyProjectOrder(previousProjects);
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : 'Unable to save project order',
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const reorderProject = (
+    sourceId: string,
+    targetId: string,
+    edge: ProjectDropTarget['edge'],
+  ) => {
+    if (!content || saving || sourceId === targetId) return;
+    const previousProjects = content.projects;
+    const source = previousProjects.find((item) => item.id === sourceId);
+    if (!source) return;
+
+    const remaining = previousProjects.filter((item) => item.id !== sourceId);
+    const targetIndex = remaining.findIndex((item) => item.id === targetId);
+    if (targetIndex < 0) return;
+    remaining.splice(targetIndex + (edge === 'after' ? 1 : 0), 0, source);
+    const projects = remaining.map((item, index) => ({
+      ...item,
+      sortOrder: index + 1,
+    }));
+    if (
+      projects.every((item, index) => item.id === previousProjects[index]?.id)
+    )
+      return;
+
+    applyProjectOrder(projects);
+    void saveProjectOrder(projects, previousProjects);
+  };
+
   const updateSocial = (id: string, patch: Partial<SocialLink>) =>
     setSocials((current) =>
       current.map((item) => (item.id === id ? { ...item, ...patch } : item)),
@@ -453,7 +533,7 @@ export function AdminClient({
               <div className="panel-title">
                 <div>
                   <h2>Projects</h2>
-                  <p>{content.projects.length} saved</p>
+                  <p>{content.projects.length} saved · Drag to reorder</p>
                 </div>
                 <Button
                   size="sm"
@@ -471,13 +551,88 @@ export function AdminClient({
                     <p>No projects yet. Add your first video link.</p>
                   </div>
                 )}
-                {content.projects.map((item) => (
+                {content.projects.map((item, index) => (
                   <button
-                    className={project.id === item.id ? 'selected' : ''}
+                    className={[
+                      project.id === item.id ? 'selected' : '',
+                      draggedProjectId === item.id ? 'dragging' : '',
+                      projectDropTarget?.id === item.id
+                        ? `drop-${projectDropTarget.edge}`
+                        : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
                     key={item.id}
+                    type="button"
+                    draggable={!saving}
+                    aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
+                    title="Drag to reorder · Alt + Arrow keys"
                     onClick={() => {
                       setProject(item);
                       setDeleteTarget('');
+                    }}
+                    onDragStart={(event) => {
+                      if (saving) {
+                        event.preventDefault();
+                        return;
+                      }
+                      event.dataTransfer.effectAllowed = 'move';
+                      event.dataTransfer.setData('text/plain', item.id);
+                      setDraggedProjectId(item.id);
+                      setProjectDropTarget(null);
+                    }}
+                    onDragOver={(event) => {
+                      if (!draggedProjectId || draggedProjectId === item.id)
+                        return;
+                      event.preventDefault();
+                      event.dataTransfer.dropEffect = 'move';
+                      const bounds = event.currentTarget.getBoundingClientRect();
+                      setProjectDropTarget({
+                        id: item.id,
+                        edge:
+                          event.clientY < bounds.top + bounds.height / 2
+                            ? 'before'
+                            : 'after',
+                      });
+                    }}
+                    onDrop={(event) => {
+                      event.preventDefault();
+                      const sourceId =
+                        event.dataTransfer.getData('text/plain') ||
+                        draggedProjectId;
+                      const bounds = event.currentTarget.getBoundingClientRect();
+                      reorderProject(
+                        sourceId,
+                        item.id,
+                        projectDropTarget?.id === item.id
+                          ? projectDropTarget.edge
+                          : event.clientY < bounds.top + bounds.height / 2
+                            ? 'before'
+                            : 'after',
+                      );
+                      setDraggedProjectId('');
+                      setProjectDropTarget(null);
+                    }}
+                    onDragEnd={() => {
+                      setDraggedProjectId('');
+                      setProjectDropTarget(null);
+                    }}
+                    onKeyDown={(event) => {
+                      if (
+                        !event.altKey ||
+                        saving ||
+                        !['ArrowUp', 'ArrowDown'].includes(event.key)
+                      )
+                        return;
+                      const direction = event.key === 'ArrowUp' ? -1 : 1;
+                      const target = content.projects[index + direction];
+                      if (!target) return;
+                      event.preventDefault();
+                      reorderProject(
+                        item.id,
+                        target.id,
+                        direction < 0 ? 'before' : 'after',
+                      );
                     }}
                   >
                     <span
@@ -497,6 +652,7 @@ export function AdminClient({
                     <i className={item.published ? 'live' : ''}>
                       {item.published ? 'Live' : 'Draft'}
                     </i>
+                    <GripVertical className="project-drag-grip" aria-hidden />
                   </button>
                 ))}
               </div>
@@ -695,19 +851,6 @@ export function AdminClient({
                     )}
                   </label>
                 </div>
-                <Field label="Display order">
-                  <Input
-                    type="number"
-                    min="0"
-                    value={project.sortOrder}
-                    onChange={(event) =>
-                      setProject({
-                        ...project,
-                        sortOrder: Number(event.target.value),
-                      })
-                    }
-                  />
-                </Field>
               </div>
               <div className="publish-row">
                 <span>
